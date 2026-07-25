@@ -1,10 +1,10 @@
-<x-base title="Lotes">
+<x-base title="Trabajadores">
     <div class="row">
         <div class="app-content" bis_skin_checked="1">
             <div class="container-fluid" bis_skin_checked="1">
                 <div class="card" bis_skin_checked="1">
                     <div class="card-header" bis_skin_checked="1">
-                        <h3 class="card-title">Listado de lotes</h3>
+                        <h3 class="card-title">Listado de Trabajadores</h3>
                         <div class="card-tools" bis_skin_checked="1">
                             <div class="input-group input-group-sm" style="width: 16rem" bis_skin_checked="1">
                                 <span class="input-group-text">
@@ -29,34 +29,31 @@
                                 <i class="bi bi-printer me-1" aria-hidden="true"></i>
                                 Print
                             </button>
-                            <a href="{{ route('lote-create') }}" id="print-table" type="button"
+                            <a href="{{ route('trabajadores.create') }}" id="print-table" type="button"
                                 class="btn btn-sm btn-outline-success">
                                 <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
-                                Crear lote
+                                Crear trabajador
                             </a>
                         </div>
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">Nombre</th>
-                                    <th scope="col">Ubicacion</th>
-                                    <th scope="col">Cultivo</th>
-                                    <th scope="col">Variedad</th>
-                                    <th scope="col">Peso promedio</th>
-                                    <th scope="col">Finca</th>
+                                    <th scope="col">Nombres</th>
+                                    <th scope="col">Apellidos</th>
+                                    <th scope="col">Documento</th>
+                                    <th scope="col">Fecha de ingreso</th>
+                                    <th scope="col">Opciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($lotes as $lote)
+                                @forelse ($trabajadores as $trabajador)
                                     <tr>
-                                        <th scope="row">{{ $lote->id }}</th>
-                                        <td>{{ $lote->nombre }}</td>
-                                        <td>{{ $lote->ubicacion }}</td>
-                                        <td>{{ $lote->cultivo }}</td>
-                                        <td>{{ $lote->variedad }}</td>
-                                        <td>{{ $lote->peso_prom }}</td>
-                                        <td>{{ $lote->finca->nombre }}</td>
+                                        <th scope="row">{{ $trabajador->id }}</th>
+                                        <td>{{ $trabajador->nombres }}</td>
+                                        <td>{{ $trabajador->apellidos }}</td>
+                                        <td>{{ $trabajador->numero_documento }}</td>
+                                        <td>{{ $trabajador->fecha_ingreso }}</td>
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <!-- Botón de Ver (Ojo) -->
@@ -66,18 +63,20 @@
                                                 </button>
 
                                                 <!-- Botón de Editar (Lápiz) -->
-                                                <a href="{{ route('lote-edit', $lote->id) }}" type="button"
-                                                    class="btn btn-sm btn-outline-secondary" title="Editar">
+                                                <a href="{{ route('trabajadores.edit', $trabajador->id) }}"
+                                                    type="button" class="btn btn-sm btn-outline-secondary"
+                                                    title="Editar">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
 
                                                 <!-- Botón de Eliminar (Basura) -->
-                                                <form action="{{ route('lote-destroy', $lote->id) }}" method="POST"
-                                                    class="d-inline">
+                                                <form action="{{ route('trabajadores.destroy', $trabajador->id) }}"
+                                                    method="POST" class="d-inline">
                                                     @csrf
+                                                    @method('DELETE')
 
                                                     <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                        onclick="return confirm('¿Estás completamente seguro de eliminar el lote {{ $lote->nombre }}? Esta acción no se puede deshacer.');">
+                                                        onclick="return confirm('¿Estás completamente seguro de eliminar el trabajador «{{ $trabajador->nombre }}»? Esta acción no se puede deshacer.');">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </form>

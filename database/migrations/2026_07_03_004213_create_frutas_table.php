@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('acopio_id')->constrained('acopios')->onDelete('cascade');
             $table->foreignId('lote_id')->constrained('lotes')->onDelete('cascade');
             $table->float('cant_racimos');
+            $table->float('peso_promedio')->nullable();
             $table->dateTime('fecha_cosecha')->nullable();
             $table->float('peso_aprox')->nullable();
             $table->timestamps();

@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\AcopioController;
+use App\Http\Controllers\CargoController;
 use App\Http\Controllers\FincaController;
 use App\Http\Controllers\LoteController;
+use App\Http\Controllers\TrabajadorController;
 use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
 
@@ -42,6 +45,18 @@ Route::prefix('lote')->group(function () {
     Route::post('/edit/{id}', [LoteController::class, 'update'])->name('lote-update');
     Route::post('/delete/{id}', [LoteController::class, 'destroy'])->name('lote-destroy');
 });
+
+Route::prefix('acopio')->group(function () {
+    Route::get('/', [AcopioController::class, 'index'])->name('acopios');
+    Route::get('/add', [AcopioController::class, 'create'])->name('acopio-create');
+    Route::get('/edit/{id}', [AcopioController::class, 'edit'])->name('acopio-edit');
+    Route::post('/add', [AcopioController::class, 'store'])->name('acopio-store');
+    Route::post('/edit/{id}', [AcopioController::class, 'update'])->name('acopio-update');
+    Route::post('/delete/{id}', [AcopioController::class, 'destroy'])->name('acopio-destroy');
+});
+
+Route::resource('cargos', CargoController::class)->except(['show']);
+Route::resource('trabajadores', TrabajadorController::class)->except(['show']);
 
 Route::middleware(['auth'])->group(function () {
     Route::livewire('invitations/{invitation}/accept', 'pages::teams.accept-invitation')->name('invitations.accept');

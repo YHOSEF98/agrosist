@@ -72,18 +72,52 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('fincas') }}" class="nav-link">
+                            <a href="{{ route('lotes') }}" class="nav-link">
                                 <i class="nav-icon bi bi-circle"></i>
                                 <p>Lotes</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('acopios') }}" class="nav-link">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Acopios</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('cargos.index') }}" class="nav-link">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Cargos</p>
                             </a>
                         </li>
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="./users.html" class="nav-link">
+                    <a href="#" class="nav-link">
                         <i class="nav-icon bi bi-people"></i>
-                        <p>Users</p>
+                        <p>Usuarios
+                            <i class="nav-arrow bi bi-chevron-right"></i>
+                        </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Usuarios</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('trabajadores.index') }}" class="nav-link">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Trabajadores</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Proveedores</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 <li class="nav-header">EXAMPLES</li>

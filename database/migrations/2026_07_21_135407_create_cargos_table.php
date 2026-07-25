@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('acopios', function (Blueprint $table) {
+        Schema::create('cargos', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->boolean('estado')->default(true);
-            $table->foreignId('finca_id')->constrained('fincas')->onDelete('cascade');
+            $table->string('descripcion')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('acopios');
+        Schema::dropIfExists('cargos');
     }
 };
