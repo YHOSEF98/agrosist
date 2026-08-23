@@ -41,9 +41,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="./tables/data.html" class="nav-link">
+                            <a href="#" class="nav-link">
                                 <i class="nav-icon bi bi-circle"></i>
                                 <p>Alce de fruto</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('cuadrillas.index') }}" class="nav-link">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Equipos de trabajo</p>
                             </a>
                         </li>
                     </ul>
@@ -87,6 +93,12 @@
                             <a href="{{ route('cargos.index') }}" class="nav-link">
                                 <i class="nav-icon bi bi-circle"></i>
                                 <p>Cargos</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('labores.index') }}" class="nav-link">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Labores</p>
                             </a>
                         </li>
                     </ul>
