@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pluviometria;
+use App\Models\Pluviometro;
 use Illuminate\Http\Request;
 
 class PluviometriaController extends Controller
@@ -21,7 +22,8 @@ class PluviometriaController extends Controller
      */
     public function create()
     {
-        //
+        $pluviometros = Pluviometro::all();
+        return view('modules.pluviometria.create', compact('pluviometros'));
     }
 
     /**
@@ -29,7 +31,16 @@ class PluviometriaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'pluviometro_id' => 'required|exists:pluviometros,id',
+            'fecha' => 'required|date',
+            'cantidad' => 'required|numeric',
+        ]);
+
+        Pluviometria::create($request->all());
+
+        return redirect()->route('pluviometria.index')
+            ->with('success', 'Registro de pluviometría creado exitosamente.');
     }
 
     /**
@@ -43,24 +54,41 @@ class PluviometriaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Pluviometria $pluviometria)
+    public function edit(string $id)
     {
-        //
+        $pluviometria = Pluviometria::findOrFail($id);
+        $pluviometros = Pluviometro::all();
+        return view('modules.pluviometria.create', compact('pluviometria', 'pluviometros'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Pluviometria $pluviometria)
+    public function update(Request $request, string $id)
     {
-        //
+        $pluviometria = Pluviometria::findOrFail($id);
+
+        $request->validate([
+            'pluviometro_id' => 'required|exists:pluviometros,id',
+            'fecha' => 'required|date',
+            'cantidad' => 'required|numeric',
+        ]);
+
+        $pluviometria->update($request->all());
+
+        return redirect()->route('pluviometria.index')
+            ->with('success', 'Registro de pluviometría actualizado exitosamente.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Pluviometria $pluviometria)
+    public function destroy(string $id)
     {
-        //
+        $pluviometria = Pluviometria::findOrFail($id);
+        $pluviometria->delete();
+
+        return redirect()->route('pluviometria.index')
+            ->with('success', 'Registro de pluviometría eliminado exitosamente.');
     }
 }

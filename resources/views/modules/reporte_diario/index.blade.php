@@ -1,12 +1,18 @@
-<x-base title="Pluviometria">
+<x-base title="Reportes diarios">
     <div class="row">
         <div class="app-content" bis_skin_checked="1">
             <div class="container-fluid" bis_skin_checked="1">
                 <div class="card" bis_skin_checked="1">
                     <div class="card-header" bis_skin_checked="1">
-                        <h3 class="card-title">Record de pluviometria</h3>
+                        <h3 class="card-title">Listado de reportes diarios</h3>
                         <div class="card-tools" bis_skin_checked="1">
-                            
+                            <div class="input-group input-group-sm" style="width: 16rem" bis_skin_checked="1">
+                                <span class="input-group-text">
+                                    <i class="bi bi-search" aria-hidden="true"></i>
+                                </span>
+                                <input id="table-filter" type="search" class="form-control" placeholder="Filtrar por…"
+                                    aria-label="Filter rows">
+                            </div>
                         </div>
                     </div>
                     <div class="card-body" bis_skin_checked="1">
@@ -19,14 +25,14 @@
                                 <i class="bi bi-filetype-json me-1" aria-hidden="true"></i>
                                 Export JSON
                             </button>
-                            <a href="{{ route('pluviometros.index') }}" type="button" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-droplet-half me-1" aria-hidden="true"></i>
-                                Pluviometros
-                            </a>
-                            <a href="{{ route('pluviometria.create') }}" id="print-table" type="button"
+                            <button id="print-table" type="button" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-printer me-1" aria-hidden="true"></i>
+                                Print
+                            </button>
+                            <a href="{{ route('reportes-diarios.create') }}" id="print-table" type="button"
                                 class="btn btn-sm btn-outline-success">
                                 <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
-                                Registrar Pluviometría
+                                Crear reporte
                             </a>
                         </div>
                         <table class="table">
@@ -34,18 +40,27 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Fecha</th>
-                                    <th scope="col">Pluviometro</th>
-                                    <th scope="col">Cantidad</th>
+                                    <th scope="col">Cuadrilla</th>
+                                    <th scope="col">Labor</th>
+                                    <th scope="col">Observacion</th>
                                     <th scope="col">Opciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($pluviometrias as $pluviometria)
+                                @forelse ($reportesDiarios as $reporteDiario)
                                     <tr>
-                                        <th scope="row">{{ $pluviometria->id }}</th>
-                                        <td>{{ $pluviometria->fecha }}</td>
-                                        <td><code>{{ $pluviometria->pluviometro->nombre ?? 'N/A' }}</code></td>
-                                        <td><code>{{ $pluviometria->cantidad }}</code></td>
+                                        <th scope="row">{{ $reporteDiario->id }}</th>
+                                        <td>{{ $reporteDiario->fecha }}</td>
+                                        <td>{{ $reporteDiario->cuadrilla->nombre ?? '' }}</td>
+                                        <td>{{ $reporteDiario->labor->actividad ?? '' }}</td>
+                                        <td>{{ $reporteDiario->observacion }}</td>
+                                        <td>
+                                            @foreach ($reporteDiario->cuadrilla->trabajadores as $trabajador)
+                                                <li>{{ $trabajador->nombres }} {{ $trabajador->apellidos }}</li>
+                                            @endforeach
+                                        </ul>
+                                        </td>
+                                        <td>{{ $reporteDiario->labor->actividad ?? '' }}</td>
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <!-- Botón de Ver (Ojo) -->
@@ -55,19 +70,18 @@
                                                 </button>
 
                                                 <!-- Botón de Editar (Lápiz) -->
-                                                <a href="{{ route('pluviometria.edit',  $pluviometria->id) }}" type="button"
+                                                <a href="{{ route('cuadrillas.edit', $cuadrilla->id) }}" type="button"
                                                     class="btn btn-sm btn-outline-secondary" title="Editar">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
 
                                                 <!-- Botón de Eliminar (Basura) -->
-                                                <form action="{{ route('pluviometria.destroy', $pluviometria->id) }}"
-                                                    method="POST" class="d-inline">
+                                                <form action="#" method="POST"
+                                                    class="d-inline">
                                                     @csrf
-                                                    @method('DELETE')
 
                                                     <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                        onclick="return confirm('¿Estás completamente seguro de eliminar la actividad «{{ $pluviometria->fecha}}»? Esta acción no se puede deshacer.');">
+                                                        onclick="return confirm('¿Estás completamente seguro de eliminar la Cuadrilla «{{ $cuadrilla->nombre }}»? Esta acción no se puede deshacer.');">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </form>
@@ -77,7 +91,7 @@
                                 @empty
                                     <!-- Este bloque se activa automáticamente si no hay empresas en la base de datos -->
                                     <tr>
-                                        <td colspan="8" class="text-center py-4 text-muted">
+                                        <td colspan="4" class="text-center py-4 text-muted">
                                             <i class="bi bi-info-circle me-1"></i> No hay datos creados actualmente
                                         </td>
                                     </tr>

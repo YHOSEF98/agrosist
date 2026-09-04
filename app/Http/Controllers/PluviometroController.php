@@ -47,9 +47,10 @@ class PluviometroController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Pluviometro $pluviometro)
+    public function show(string $id)
     {
-        //
+        $pluviometro = Pluviometro::findOrFail($id);
+        return view('modules.pluviometro.show', compact('pluviometro'));
     }
 
     /**

@@ -107,7 +107,7 @@ class CuadrillaController extends Controller
             'labore_id' => 'required|exists:labores,id',
             'observacion' => 'nullable|string',
             'trabajadores' => 'required|array|min:1',
-            'trabajadores.*' => 'exists:trabajadores,id',
+            'trabajadores.*.id' => 'exists:trabajadores,id',
         ]);
 
         $cuadrilla = Cuadrilla::findOrFail($id);
@@ -137,8 +137,8 @@ class CuadrillaController extends Controller
 
         // Actualizar trabajadores en la tabla intermedia
         $syncData = [];
-        foreach ($request->trabajadores as $trabajadorId) {
-            $syncData[$trabajadorId] = ['fecha' => $request->fecha];
+        foreach ($request->trabajadores as $trabajador) {
+            $syncData[$trabajador['id']] = ['fecha' => $request->fecha];
         }
 
         $cuadrilla->trabajadores()->sync($syncData);

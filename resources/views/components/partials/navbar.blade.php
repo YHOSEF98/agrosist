@@ -35,7 +35,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="./tables/simple.html" class="nav-link">
+                            <a href="{{ route('reportes-diarios.index') }}" class="nav-link">
                                 <i class="nav-icon bi bi-circle"></i>
                                 <p>Reportes Diarios</p>
                             </a>
@@ -50,6 +50,12 @@
                             <a href="{{ route('cuadrillas.index') }}" class="nav-link">
                                 <i class="nav-icon bi bi-circle"></i>
                                 <p>Equipos de trabajo</p>
+                            </a>
+                        </li>
+                         <li class="nav-item">
+                            <a href="{{ route('pluviometros.index') }}" class="nav-link">
+                                <i class="nav-icon bi bi-circle"></i>
+                                <p>Pluviometria</p>
                             </a>
                         </li>
                     </ul>

@@ -1,4 +1,4 @@
-<x-base title="plubviometros">
+<x-base title="Pluviometros">
     <div class="row">
         <div class="app-content" bis_skin_checked="1">
             <div class="container-fluid" bis_skin_checked="1">
@@ -55,10 +55,10 @@
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <!-- Botón de Ver (Ojo) -->
-                                                <button type="button" class="btn btn-sm btn-outline-warning"
+                                                <a href="{{ route('pluviometros.show', $pluviometro->id) }}" type="button" class="btn btn-sm btn-outline-warning"
                                                     title="Ver detalles">
                                                     <i class="bi bi-eye"></i>
-                                                </button>
+                                                </a>
 
                                                 <!-- Botón de Editar (Lápiz) -->
                                                 <a href="{{ route('pluviometros.edit', $pluviometro->id) }}" type="button"
