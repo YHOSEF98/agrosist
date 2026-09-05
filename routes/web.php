@@ -66,7 +66,7 @@ Route::resource('labores', LaboreController::class)->except(['show']);
 Route::resource('cuadrillas', CuadrillaController::class)->except(['show','destroy']);
 Route::resource('pluviometros', PluviometroController::class);
 Route::resource('pluviometria', PluviometriaController::class)->except(['show']);
-Route::resource('reportes-diarios', ReportesDiarioController::class)->except(['show', 'destroy', 'edit']);
+Route::resource('reportes-diarios', ReportesDiarioController::class)->except(['show', 'destroy','update']);
 
 Route::middleware(['auth'])->group(function () {
     Route::livewire('invitations/{invitation}/accept', 'pages::teams.accept-invitation')->name('invitations.accept');

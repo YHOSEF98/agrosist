@@ -35,7 +35,6 @@ class ReportesDiarioController extends Controller
      */
     public function store(Request $request)
     {
-        
         return view('modules.reporte_diario.index');
     }
 
@@ -50,10 +49,19 @@ class ReportesDiarioController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ReportesDiario $reportesDiario)
+    public function edit(string $id)
     {
-        //
-    }
+    // Buscar el reporte por ID
+    $reporte = ReportesDiario::with(['cuadrilla', 'detalles'])->findOrFail($id);
+
+    // Traer las colecciones necesarias para los selects
+    $lotes = Lote::all();
+    $acopios = Acopio::all();
+    $labores = Labore::all();
+
+    // Retornar la vista de edición con los datos cargados
+    return view('modules.reporte_diario.create', compact('reporte', 'labores', 'lotes', 'acopios'));
+}
 
     /**
      * Update the specified resource in storage.

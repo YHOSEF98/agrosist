@@ -21,4 +21,9 @@ class ReportesDiario extends Model
     {
         return $this->belongsTo(Labore::class, 'labore_id');
     }
+
+    public function detalles()
+    {
+        return $this->hasMany(DetReportesDiario::class, 'reporte_diario_id');
+    }
 }

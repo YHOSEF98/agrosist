@@ -42,6 +42,7 @@
                                     <th scope="col">Fecha</th>
                                     <th scope="col">Cuadrilla</th>
                                     <th scope="col">Labor</th>
+                                    <th scope="col">Trabajadores</th>
                                     <th scope="col">Observacion</th>
                                     <th scope="col">Opciones</th>
                                 </tr>
@@ -52,15 +53,13 @@
                                         <th scope="row">{{ $reporteDiario->id }}</th>
                                         <td>{{ $reporteDiario->fecha }}</td>
                                         <td>{{ $reporteDiario->cuadrilla->nombre ?? '' }}</td>
-                                        <td>{{ $reporteDiario->labor->actividad ?? '' }}</td>
-                                        <td>{{ $reporteDiario->observacion }}</td>
-                                        <td>
+                                        <td>{{ $reporteDiario->cuadrilla->labor->actividad ?? '' }}</td>
+                                        <td><ul>
                                             @foreach ($reporteDiario->cuadrilla->trabajadores as $trabajador)
                                                 <li>{{ $trabajador->nombres }} {{ $trabajador->apellidos }}</li>
-                                            @endforeach
-                                        </ul>
-                                        </td>
-                                        <td>{{ $reporteDiario->labor->actividad ?? '' }}</td>
+                                            @endforeach        
+                                        </ul></td>
+                                        <td>{{ $reporteDiario->observacion }}</td>
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <!-- Botón de Ver (Ojo) -->
@@ -70,7 +69,7 @@
                                                 </button>
 
                                                 <!-- Botón de Editar (Lápiz) -->
-                                                <a href="{{ route('cuadrillas.edit', $cuadrilla->id) }}" type="button"
+                                                <a href="{{ route('reportes-diarios.edit', $reporteDiario->id) }}" type="button"
                                                     class="btn btn-sm btn-outline-secondary" title="Editar">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
@@ -81,7 +80,7 @@
                                                     @csrf
 
                                                     <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                        onclick="return confirm('¿Estás completamente seguro de eliminar la Cuadrilla «{{ $cuadrilla->nombre }}»? Esta acción no se puede deshacer.');">
+                                                        onclick="return confirm('¿Estás completamente seguro de eliminar la Cuadrilla «»? Esta acción no se puede deshacer.');">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </form>

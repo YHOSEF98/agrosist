@@ -2,13 +2,15 @@
 
 use Livewire\Component;
 use App\Models\ReportesDiario;
+use App\Models\DetReportesDiario;
 use App\Models\Cuadrilla;
+use Illuminate\Support\Facades\DB;
 
 new class extends Component
 {
-    public $action, $isEdit, $reporte, $labores, $lotes, $acopios,$fecha;
+    public $observacion, $reporte, $labores, $lotes, $acopios,$fecha;
     public $loteSeleccionado, $acopioSeleccionado, $lineasSeleccionadas, $cantidadSeleccionada, $laborSeleccionada, $cuadrillaSeleccionada;
-    public $acopioSeleccionadoId, $loteSeleccionadoId;
+    public $isEdit = false;
     public $laborNombre;
     public $detalles = [];
     public $cuadrillas = [];
@@ -16,15 +18,57 @@ new class extends Component
 
     protected $listeners = ['fechaActualizada'];
 
+   public function mount($reporte = null, $labores, $lotes, $acopios, $cuadrillas = [])
+    {
+        $this->labores = $labores;
+        $this->lotes = $lotes;
+        $this->acopios = $acopios;
+        $this->cuadrillas = $cuadrillas;
+
+        if ($reporte) {
+            $this->isEdit = true;
+            $this->reporte = $reporte;
+
+            $this->fecha = $reporte->fecha;
+            $this->cuadrillaSeleccionada = $reporte->cuadrilla_id;
+            $this->laborSeleccionada = $reporte->labore_id;
+            $this->observacion = $reporte->observacion;
+
+            $this->detalles = $reporte->detalles->map(fn($d) => [
+                'lote_id' => $d->lote_id,
+                'acopio_id' => $d->acopios_id,
+                'linea' => $d->lineas,
+                'cantidad' => $d->cantidad,
+            ])->toArray();
+
+
+            // 👇 Forzar que la cuadrilla asignada esté en la lista
+           if (!collect($this->cuadrillas)->contains('id', $this->cuadrillaSeleccionada)) {
+                $this->cuadrillas[] = Cuadrilla::with(['labor','trabajadores'])->find($this->cuadrillaSeleccionada);
+            }
+
+            if ($reporte->cuadrilla->labor) {
+                $this->laborNombre = $reporte->cuadrilla->labor->actividad;
+            }
+                    }
+    }
+
     public function fechaActualizada($fecha)
     {
         $this->fecha = $fecha;
-        // 1. Obtener IDs de cuadrillas ya reportadas en esa fecha
-        $cuadrillasReportadas = ReportesDiario::whereDate('fecha', $this->fecha)
-            ->pluck('cuadrilla_id');
 
-        // 2. Traer cuadrillas creadas en esa fecha que NO estén reportadas
-       $this->cuadrillas = Cuadrilla::with(['labor','trabajadores'])
+        // IDs de cuadrillas ya reportadas en esa fecha
+        $cuadrillasReportadas = ReportesDiario::whereDate('fecha', $this->fecha)
+            ->pluck('cuadrilla_id')
+            ->toArray();
+
+        // Si es edición, quitamos la cuadrilla actual de la lista de excluidos
+        if ($this->isEdit && $this->cuadrillaSeleccionada) {
+            $cuadrillasReportadas = array_diff($cuadrillasReportadas, [$this->cuadrillaSeleccionada]);
+        }
+
+        // Traer cuadrillas creadas en esa fecha que NO estén reportadas
+        $this->cuadrillas = Cuadrilla::with(['labor','trabajadores'])
             ->whereDate('fecha', $this->fecha)
             ->whereNotIn('id', $cuadrillasReportadas)
             ->get();
@@ -67,12 +111,71 @@ new class extends Component
         unset($this->detalles[$index]);
         $this->detalles = array_values($this->detalles); // Reindexar el array
     }
+
+    protected $rules = [
+        'fecha' => 'required|date',
+        'cuadrillaSeleccionada' => 'required|exists:cuadrillas,id',
+        'laborSeleccionada' => 'required|exists:labores,id',
+        'reporte.observacion' => 'nullable|string|max:255',
+
+        // Validaciones para los detalles
+        'detalles.*.lote_id' => 'required|exists:lotes,id',
+        'detalles.*.acopio_id' => 'nullable|exists:acopios,id',
+        'detalles.*.linea' => 'nullable|string|max:255',
+        'detalles.*.cantidad' => 'required|numeric|min:1',
+    ];
+
+    public function save()
+{
+    $this->validate();
+
+    if ($this->isEdit) {
+        // Actualizar el reporte existente
+        $this->reporte->update([
+            'fecha' => $this->fecha,
+            'cuadrilla_id' => $this->cuadrillaSeleccionada,
+            'labore_id' => $this->laborSeleccionada,
+            'observacion' => $this->reporte->observacion ?? null,
+        ]);
+
+        // Eliminar detalles anteriores y volver a guardar
+        $this->reporte->detalles()->delete();
+        foreach ($this->detalles as $detalle) {
+            $this->reporte->detalles()->create([
+                'acopios_id' => $detalle['acopio_id'] ?? null,
+                'lote_id' => $detalle['lote_id'],
+                'lineas' => $detalle['linea'] ?? null,
+                'cantidad' => $detalle['cantidad'],
+            ]);
+        }
+    } else {
+        // Crear nuevo reporte
+        $reporte = ReportesDiario::create([
+            'fecha' => $this->fecha,
+            'cuadrilla_id' => $this->cuadrillaSeleccionada,
+            'labore_id' => $this->laborSeleccionada,
+            'observacion' => $this->reporte['observacion'] ?? null,
+        ]);
+
+        foreach ($this->detalles as $detalle) {
+            $reporte->detalles()->create([
+                'acopios_id' => $detalle['acopio_id'] ?? null,
+                'lote_id' => $detalle['lote_id'],
+                'lineas' => $detalle['linea'] ?? null,
+                'cantidad' => $detalle['cantidad'],
+            ]);
+        }
+    }
+
+    return redirect()->route('reportes_diarios.index')->with('success', $this->isEdit ? 'Reporte actualizado exitosamente.' : 'Reporte creado exitosamente.');
+}
+    
 };
 ?>
 
 <div class="card-body">
 
-                        <form action="{{ $action }}" method="POST">
+                        <form wire:submit.prevent="save">
                             @csrf
                             @if ($isEdit)
                                 @method('PUT')
@@ -157,7 +260,7 @@ new class extends Component
                         </tr>
                       </thead>
                       <tbody>
-                        @foreach ($detalles as $detalle)
+                        @forelse ($detalles as $detalle)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $lotes->find($detalle['lote_id'])->nombre ?? 'N/A' }}</td>
@@ -170,8 +273,15 @@ new class extends Component
                                     </button>
                                 </td>
                             </tr>
+                            @empty
+                                    <!-- Este bloque se activa automáticamente si no hay detalle en la base de datos -->
+                                    <tr>
+                                        <td colspan="8" class="text-center py-4 text-muted">
+                                            <i class="bi bi-info-circle me-1"></i> No hay detalle asignado actualmente
+                                        </td>
+                                    </tr>
                             
-                        @endforeach
+                        @endforelse
                       </tbody>
                     </table>
                   </div>
@@ -223,7 +333,7 @@ new class extends Component
                 </div>
 </div>
 
-                            <a href="{{ route('cuadrillas.index') }}" class="btn btn-warning">
+                            <a href="{{ route('reportes-diarios.index') }}" class="btn btn-warning" type="button">
                                 <i class="bi bi-arrow-left-short"></i> Volver
                             </a>
 
