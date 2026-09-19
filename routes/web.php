@@ -11,6 +11,8 @@ use App\Http\Controllers\CuadrillaController;
 use App\Http\Controllers\PluviometroController;
 use App\Http\Controllers\PluviometriaController;
 use App\Http\Controllers\ReportesDiarioController;
+use App\Http\Controllers\ProvedoreController;
+use App\Http\Controllers\ConductoreController;
 use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
 
@@ -67,6 +69,8 @@ Route::resource('cuadrillas', CuadrillaController::class)->except(['show','destr
 Route::resource('pluviometros', PluviometroController::class);
 Route::resource('pluviometria', PluviometriaController::class)->except(['show']);
 Route::resource('reportes-diarios', ReportesDiarioController::class)->except(['show', 'destroy','update']);
+Route::resource('proveedores', ProvedoreController::class)->except(['show']);
+Route::resource('conductores', ConductoreController::class)->except(['show']);
 
 Route::middleware(['auth'])->group(function () {
     Route::livewire('invitations/{invitation}/accept', 'pages::teams.accept-invitation')->name('invitations.accept');

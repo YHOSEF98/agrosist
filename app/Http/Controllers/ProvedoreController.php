@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Empresa;
+use App\Models\Provedore;
 use Illuminate\Http\Request;
 
-class EmpresaController extends Controller
+class ProvedoreController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $empresas = Empresa::all();
-        return view('modules.empresa.index', compact('empresas'));
+        $proveedores = Provedore::all();
+        return view('modules.proveedores.index', compact('proveedores'));
     }
 
     /**
@@ -21,7 +21,7 @@ class EmpresaController extends Controller
      */
     public function create()
     {
-        return view('modules.empresa.create');
+        return view('modules.proveedores.create');
     }
 
     /**
@@ -29,17 +29,19 @@ class EmpresaController extends Controller
      */
     public function store(Request $request)
     {
+        
         // 1. Validar los datos que vienen del formulario
         $request->validate([
-                'razon_social' => 'required|string|max:255|unique:empresas,razon_social',
+                'razon_social' => 'required|string|max:255|unique:provedores,razon_social',
                 'nombre_comercial' => 'nullable|string|max:255',
                 'tipo_contribuyente' => 'required|string|max:255',
                 'tipo_documento' => 'required|string|max:255',
-                'numero_documento' => 'required|string|max:15|unique:empresas,numero_documento',
+                'numero_documento' => 'required|string|max:15|unique:provedores,numero_documento',
                 'digito_verificacion' => 'nullable|string|max:1',
                 'direccion' => 'nullable|string|max:255',
                 'telefono' => 'nullable|string|max:20',
                 'email' => 'nullable|email|max:255',
+                'es_cliente' => 'nullable|boolean',
             ], [
                 // Mensajes personalizados en español
                 'razon_social.required' => 'La razón social de la empresa es obligatoria.',
@@ -50,7 +52,7 @@ class EmpresaController extends Controller
             ]);
 
             // 2. Crear el registro en la base de datos
-            Empresa::create([
+            Provedore::create([
                 'razon_social' => $request->razon_social,
                 'nombre_comercial' => $request->nombre_comercial,
                 'tipo_contribuyente' => $request->tipo_contribuyente,
@@ -60,30 +62,30 @@ class EmpresaController extends Controller
                 'direccion' => $request->direccion,
                 'telefono' => $request->telefono,
                 'email' => $request->email,
+                'es_cliente' => $request->es_cliente ?? false,
             ]);
 
             // 3. Redireccionar al index con un mensaje de éxito para AdminLTE
             return redirect()
-                ->route('empresa')
-                ->with('success', 'Empresa registrada correctamente.');
-        }
+                ->route('proveedores.index')
+                ->with('success', 'Proveedor registrado correctamente.');
+    }
 
     /**
      * Display the specified resource.
      */
-    public function show(Empresa $empresa)
+    public function show(Provedore $provedore)
     {
-        $empresa = Empresa::findOrFail($empresa->id);
-        return view('modules.empresa.show', compact('empresa'));
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request)
+    public function edit(string $id)
     {
-        $empresa = Empresa::findOrFail($request->id);
-        return view('modules.empresa.create', compact('empresa'));
+        $proveedor = Provedore::findOrFail($id);
+        return view('modules.proveedores.create', compact('proveedor'));
     }
 
     /**
@@ -91,18 +93,19 @@ class EmpresaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $empresa = Empresa::findOrFail($id);
+        $proveedor = Provedore::findOrFail($id);
 
         $request->validate([
-                'razon_social' => 'required|string|max:255|unique:empresas,razon_social,' . $empresa->id,
+                'razon_social' => 'required|string|max:255|unique:empresas,razon_social,' . $proveedor->id,
                 'nombre_comercial' => 'nullable|string|max:255',
                 'tipo_contribuyente' => 'required|string|max:255',
                 'tipo_documento' => 'required|string|max:255',
-                'numero_documento' => 'required|string|max:15|unique:empresas,numero_documento,' . $empresa->id,
+                'numero_documento' => 'required|string|max:15|unique:empresas,numero_documento,' . $proveedor->id,
                 'digito_verificacion' => 'nullable|string|max:1',
                 'direccion' => 'nullable|string|max:255',
                 'telefono' => 'nullable|string|max:20',
                 'email' => 'nullable|email|max:255',
+                'es_cliente' => 'nullable|boolean',
             ], [
                 // Mensajes personalizados en español
                 'razon_social.required' => 'La razón social de la empresa es obligatoria.',
@@ -113,7 +116,7 @@ class EmpresaController extends Controller
             ]);
 
         // 3. Actualizar el registro usando asignación masiva ($fillable)
-        $empresa->update([
+        $proveedor->update([
             'razon_social' => $request->razon_social,
             'nombre_comercial' => $request->nombre_comercial,
             'tipo_contribuyente' => $request->tipo_contribuyente,
@@ -123,28 +126,24 @@ class EmpresaController extends Controller
             'direccion' => $request->direccion,
             'telefono' => $request->telefono,
             'email' => $request->email,
+            'es_cliente' => $request->es_cliente ?? false,
         ]);
 
         // 4. Redireccionar a la lista general con un mensaje de éxito
         return redirect()
-            ->route('empresa') // Redirige al nombre de tu ruta del listado principal
-            ->with('success', 'Empresa actualizada correctamente.');
-}
+            ->route('proveedores.index') // Redirige al nombre de tu ruta del listado principal
+            ->with('success', 'Proveedor actualizado correctamente.');
+    }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(string $id)
     {
-        // 1. Buscar la empresa (si no existe, lanza un error 404)
-        $empresa = Empresa::findOrFail($id);
+        $proveedore = Provedore::findOrFail($id);
+        $proveedore->delete();
 
-        // 2. Eliminar el registro
-        $empresa->delete();
-
-        // 3. Redireccionar al listado con un mensaje de éxito
-        return redirect()
-            ->route('empresa')
-            ->with('success', 'La empresa ha sido eliminada correctamente.');
+        return redirect()->route('proveedores.index')
+            ->with('success', 'Proveedor eliminado correctamente.');
     }
 }

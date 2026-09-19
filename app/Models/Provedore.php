@@ -4,16 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Enums\TipoDocumento;
-use App\Enums\TipoContribuyente;
 
-class Empresa extends Model
+class Provedore extends Model
 {
+    protected $table = 'provedores';
+
     protected $casts = [
+        'es_cliente' => 'boolean',
         'tipo_documento' => TipoDocumento::class,
-        'tipo_contribuyente' => TipoContribuyente::class,
     ];
 
-    protected $fillable = [
+     protected $fillable = [
         'razon_social',
         'nombre_comercial',
         'tipo_contribuyente',
@@ -23,5 +24,11 @@ class Empresa extends Model
         'direccion',
         'telefono',
         'email',
+        'es_cliente'
     ];
+
+    public function conductores()
+    {
+        return $this->hasMany(Conductore::class);
+    }
 }

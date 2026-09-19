@@ -42,6 +42,7 @@ class LaboreController extends Controller
             'valor_prestaciones' => 'nullable|decimal:0,2',
             'valor_total' => 'nullable|decimal:0,2',
             'observaciones' => 'nullable|string|max:255',
+            'invfruta' => 'nullable|boolean',
         ], [
             'actividad.required' => 'El nombre de la finca es obligatorio.',
             'valor_unitario.required' => 'valor por unidad de medida.',
@@ -61,6 +62,7 @@ class LaboreController extends Controller
             'valor_prestaciones' => $request->valor_prestaciones,
             'valor_total' => $request->valor_total,
             'observaciones' => $request->observaciones,
+            'invfruta' => $request->invfruta,
         ]);
 
         return redirect()
@@ -102,6 +104,7 @@ class LaboreController extends Controller
             'valor_prestaciones' => 'nullable|decimal:0,2',
             'valor_total' => 'nullable|decimal:0,2',
             'observaciones' => 'nullable|string|max:255',
+            'invfruta' => 'nullable|boolean',
         ], [
             'actividad.required' => 'El nombre de la finca es obligatorio.',
             'valor_unitario.required' => 'valor por unidad de medida.',
@@ -121,6 +124,7 @@ class LaboreController extends Controller
             'valor_prestaciones' => $request->valor_prestaciones,
             'valor_total' => $request->valor_total,
             'observaciones' => $request->observaciones,
+            'invfruta' => $request->invfruta,
         ]);
 
         return redirect()

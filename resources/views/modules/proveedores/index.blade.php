@@ -1,10 +1,10 @@
-<x-base title="Empresa">
+<x-base title="Proveedores">
     <div class="row">
         <div class="app-content" bis_skin_checked="1">
             <div class="container-fluid" bis_skin_checked="1">
                 <div class="card" bis_skin_checked="1">
                     <div class="card-header" bis_skin_checked="1">
-                        <h3 class="card-title">Listado de empresas</h3>
+                        <h3 class="card-title">Listado de proveedores</h3>
                         <div class="card-tools" bis_skin_checked="1">
                             <div class="input-group input-group-sm" style="width: 16rem" bis_skin_checked="1">
                                 <span class="input-group-text">
@@ -29,10 +29,10 @@
                                 <i class="bi bi-printer me-1" aria-hidden="true"></i>
                                 Print
                             </button>
-                            <a href="{{ route('empresa-create') }}" id="print-table" type="button"
+                            <a href="{{ route('proveedores.create') }}" id="print-table" type="button"
                                 class="btn btn-sm btn-outline-success">
                                 <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
-                                Crear empresa
+                                Crear proveedor
                             </a>
                         </div>
                         <table class="table">
@@ -41,15 +41,17 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Razon social</th>
                                     <th scope="col">Numero documento</th>
+                                    <th scope="col">Telefono</th>
                                     <th scope="col">Opciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($empresas as $empresa)
+                                @forelse ($proveedores as $proveedor)
                                     <tr>
-                                        <th scope="row">{{ $empresa->id }}</th>
-                                        <td>{{ $empresa->razon_social }}</td>
-                                        <td><code>{{ $empresa->numero_documento }}</code></td>
+                                        <th scope="row">{{ $proveedor->id }}</th>
+                                        <td>{{ $proveedor->razon_social }}</td>
+                                        <td><code>{{ $proveedor->numero_documento }}</code></td>
+                                        <td><code>{{ $proveedor->telefono }}</code></td>
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <!-- Botón de Ver (Ojo) -->
@@ -59,18 +61,19 @@
                                                 </button>
 
                                                 <!-- Botón de Editar (Lápiz) -->
-                                                <a href="{{ route('empresa-edit', $empresa->id) }}" type="button"
+                                                <a href="{{ route('proveedores.edit', $proveedor->id) }}" type="button"
                                                     class="btn btn-sm btn-outline-secondary" title="Editar">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
 
                                                 <!-- Botón de Eliminar (Basura) -->
-                                                <form action="{{ route('empresa-destroy', $empresa->id) }}"
+                                                <form action="{{ route('proveedores.destroy', $proveedor->id) }}"
                                                     method="POST" class="d-inline">
                                                     @csrf
+                                                    @method('DELETE')
 
                                                     <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                        onclick="return confirm('¿Estás completamente seguro de eliminar la empresa «{{ $empresa->nombre }}»? Esta acción no se puede deshacer.');">
+                                                        onclick="return confirm('¿Estás completamente seguro de eliminar el proveedor «{{ $proveedor->razon_social }}»? Esta acción no se puede deshacer.');">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </form>
@@ -78,7 +81,7 @@
                                         </td>
                                     </tr>
                                 @empty
-                                    <!-- Este bloque se activa automáticamente si no hay empresas en la base de datos -->
+                                    <!-- Este bloque se activa automáticamente si no hay proveedores en la base de datos -->
                                     <tr>
                                         <td colspan="4" class="text-center py-4 text-muted">
                                             <i class="bi bi-info-circle me-1"></i> No hay datos creados actualmente

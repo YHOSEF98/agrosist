@@ -1,10 +1,10 @@
-<x-base title="Empresa">
+<x-base title="Conductores">
     <div class="row">
         <div class="app-content" bis_skin_checked="1">
             <div class="container-fluid" bis_skin_checked="1">
                 <div class="card" bis_skin_checked="1">
                     <div class="card-header" bis_skin_checked="1">
-                        <h3 class="card-title">Listado de empresas</h3>
+                        <h3 class="card-title">Listado de conductores</h3>
                         <div class="card-tools" bis_skin_checked="1">
                             <div class="input-group input-group-sm" style="width: 16rem" bis_skin_checked="1">
                                 <span class="input-group-text">
@@ -29,27 +29,29 @@
                                 <i class="bi bi-printer me-1" aria-hidden="true"></i>
                                 Print
                             </button>
-                            <a href="{{ route('empresa-create') }}" id="print-table" type="button"
+                            <a href="{{ route('conductores.create') }}" id="print-table" type="button"
                                 class="btn btn-sm btn-outline-success">
                                 <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
-                                Crear empresa
+                                Crear conductor
                             </a>
                         </div>
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">Razon social</th>
-                                    <th scope="col">Numero documento</th>
+                                    <th scope="col">Proveedor</th>
+                                    <th scope="col">Conductor</th>
+                                    <th scope="col">Placa</th>
                                     <th scope="col">Opciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($empresas as $empresa)
+                                @forelse ($conductores as $conductor)
                                     <tr>
-                                        <th scope="row">{{ $empresa->id }}</th>
-                                        <td>{{ $empresa->razon_social }}</td>
-                                        <td><code>{{ $empresa->numero_documento }}</code></td>
+                                        <th scope="row">{{ $conductor->id }}</th>
+                                        <td>{{ $conductor->proveedor->razon_social ?? 'N/A' }}</td>
+                                        <td>{{ $conductor->nombres }} {{ $conductor->apellidos }}</td>
+                                        <td>{{ $conductor->placa }}</td>
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <!-- Botón de Ver (Ojo) -->
@@ -59,18 +61,19 @@
                                                 </button>
 
                                                 <!-- Botón de Editar (Lápiz) -->
-                                                <a href="{{ route('empresa-edit', $empresa->id) }}" type="button"
+                                                <a href="{{ route('conductores.edit', $conductor->id) }}" type="button"
                                                     class="btn btn-sm btn-outline-secondary" title="Editar">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
 
                                                 <!-- Botón de Eliminar (Basura) -->
-                                                <form action="{{ route('empresa-destroy', $empresa->id) }}"
+                                                <form action="{{ route('conductores.destroy', $conductor->id) }}"
                                                     method="POST" class="d-inline">
                                                     @csrf
+                                                    @method('DELETE')
 
                                                     <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                        onclick="return confirm('¿Estás completamente seguro de eliminar la empresa «{{ $empresa->nombre }}»? Esta acción no se puede deshacer.');">
+                                                        onclick="return confirm('¿Estás completamente seguro de eliminar el conductor «{{ $conductor->nombres }} {{ $conductor->apellidos }}»? Esta acción no se puede deshacer.');">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </form>
@@ -78,7 +81,7 @@
                                         </td>
                                     </tr>
                                 @empty
-                                    <!-- Este bloque se activa automáticamente si no hay empresas en la base de datos -->
+                                    <!-- Este bloque se activa automáticamente si no hay conductores en la base de datos -->
                                     <tr>
                                         <td colspan="4" class="text-center py-4 text-muted">
                                             <i class="bi bi-info-circle me-1"></i> No hay datos creados actualmente

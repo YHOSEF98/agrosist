@@ -1,8 +1,8 @@
 @php
     // Detectamos dinámicamente la ruta y el método
-    $isEdit = isset($empresa) && $empresa->exists;
-    $title = $isEdit ? 'Editar empresa' : 'Crear empresa';
-    $action = $isEdit ? route('empresa-edit', $empresa->id) : route('empresa-store');
+    $isEdit = isset($proveedor) && $proveedor->exists;
+    $title = $isEdit ? 'Editar proveedor' : 'Crear proveedor';
+    $action = $isEdit ? route('proveedores.update', $proveedor->id) : route('proveedores.store');
 @endphp
 <x-base :title="$title">
     <div class="row">
@@ -24,8 +24,8 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="razon_social" class="form-label">Razon social:</label>
                                     <input type="text" class="form-control @error('razon_social') is-invalid @enderror"
-                                        id="razon_social" placeholder="Razon social de la empresa" name="razon_social"
-                                        value="{{ old('razon_social', $empresa->razon_social ?? '') }}">
+                                        id="razon_social" placeholder="Razon social del proveedor" name="razon_social"
+                                        value="{{ old('razon_social', $proveedor->razon_social ?? '') }}">
 
                                     <!-- Mensaje de error para Razon social -->
                                     @error('razon_social')
@@ -37,8 +37,8 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="nombre_comercial" class="form-label">Nombre comercial:</label>
                                     <input type="text" class="form-control @error('nombre_comercial') is-invalid @enderror"
-                                        id="nombre_comercial" placeholder="Nombre comercial de la empresa" name="nombre_comercial"
-                                        value="{{ old('nombre_comercial', $empresa->nombre_comercial ?? '') }}">
+                                        id="nombre_comercial" placeholder="Nombre comercial del proveedor" name="nombre_comercial"
+                                        value="{{ old('nombre_comercial', $proveedor->nombre_comercial ?? '') }}">
 
                                     <!-- Mensaje de error para Nombre comercial -->
                                     @error('nombre_comercial')
@@ -59,7 +59,7 @@
                                         <option value="">Seleccione...</option>
 
                                         @foreach (\App\Enums\TipoContribuyente::cases() as $tipo)
-                                            <option value="{{ $tipo->value }}" @selected(old('tipo_contribuyente', $empresa->tipo_contribuyente?->value ?? '') == $tipo->value)>
+                                            <option value="{{ $tipo->value }}" @selected(old('tipo_contribuyente', $proveedor->tipo_contribuyente?->value ?? '') == $tipo->value)>
                                                 {{ $tipo->label() }}
                                             </option>
                                         @endforeach
@@ -80,7 +80,7 @@
                                         <option value="">Seleccione...</option>
 
                                         @foreach (\App\Enums\TipoDocumento::cases() as $tipo)
-                                            <option value="{{ $tipo->value }}" @selected(old('tipo_documento', $empresa->tipo_documento?->value ?? '') == $tipo->value)>
+                                            <option value="{{ $tipo->value }}" @selected(old('tipo_documento', $proveedor->tipo_documento?->value ?? '') == $tipo->value)>
                                                 {{ $tipo->label() }}
                                             </option>
                                         @endforeach
@@ -96,7 +96,7 @@
                                     <input type="number"  step="any"
                                         class="form-control @error('numero_documento') is-invalid @enderror" id="numero_documento"
                                         name="numero_documento" placeholder="Numero de documento"
-                                        value="{{ old('numero_documento', $empresa->numero_documento ?? '') }}">
+                                        value="{{ old('numero_documento', $proveedor->numero_documento ?? '') }}">
 
                                     @error('numero_documento')
                                         <div class="invalid-feedback">
@@ -109,7 +109,7 @@
                                     <input type="number"  step="any"
                                         class="form-control @error('digito_verificacion') is-invalid @enderror" id="digito_verificacion"
                                         name="digito_verificacion" placeholder="Digito de verificación"
-                                        value="{{ old('digito_verificacion', $empresa->digito_verificacion ?? '') }}">
+                                        value="{{ old('digito_verificacion', $proveedor->digito_verificacion ?? '') }}">
 
                                     @error('digito_verificacion')
                                         <div class="invalid-feedback">
@@ -124,8 +124,8 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="email" class="form-label">Email:</label>
                                     <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                        id="email" placeholder="Email de la empresa" name="email"
-                                        value="{{ old('email', $empresa->email ?? '') }}">
+                                        id="email" placeholder="Email del proveedor" name="email"
+                                        value="{{ old('email', $proveedor->email ?? '') }}">
 
                                     <!-- Mensaje de error para Email -->
                                     @error('email')
@@ -137,8 +137,8 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="telefono" class="form-label">Telefono:</label>
                                     <input type="text" class="form-control @error('telefono') is-invalid @enderror"
-                                        id="telefono" placeholder="Telefono de la empresa" name="telefono"
-                                        value="{{ old('telefono', $empresa->telefono ?? '') }}">
+                                        id="telefono" placeholder="Telefono del proveedor" name="telefono"
+                                        value="{{ old('telefono', $proveedor->telefono ?? '') }}">
 
                                     <!-- Mensaje de error para Telefono -->
                                     @error('telefono')
@@ -150,11 +150,11 @@
                             </div>
                             <div class="row">
                                 <!-- Campo direccion -->
-                                <div class="col-md-12 mb-3">
+                                <div class="col-md-10 mb-3">
                                     <label for="direccion" class="form-label">Direccion:</label>
                                     <input type="text" class="form-control @error('direccion') is-invalid @enderror"
-                                        id="direccion" placeholder="Direccion de la empresa" name="direccion"
-                                        value="{{ old('direccion', $empresa->direccion ?? '') }}">
+                                        id="direccion" placeholder="Direccion del proveedor" name="direccion"
+                                        value="{{ old('direccion', $proveedor->direccion ?? '') }}">
 
                                     <!-- Mensaje de error para Direccion -->
                                     @error('direccion')
@@ -163,11 +163,20 @@
                                         </div>
                                     @enderror
                                 </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="es_cliente" class="form-label">Es Cliente:</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input @error('es_cliente') is-invalid @enderror" type="checkbox" id="es_cliente" name="es_cliente" value="1" {{ old('es_cliente', $proveedor->es_cliente ?? '') ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="es_cliente">
+                                            Sí
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
 
 
                             <!-- Botones de Acción -->
-                            <a href="{{ route('empresa') }}" class="btn btn-warning">
+                            <a href="{{ route('proveedores.index') }}" class="btn btn-warning">
                                 <i class="bi bi-arrow-left-short"></i> Volver
                             </a>
                             <button type="submit" class="btn btn-success">

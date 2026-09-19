@@ -17,6 +17,7 @@ class Labore extends Model
         'valor_prestaciones',
         'valor_total',
         'observaciones',
+        'invfruta',
     ];
 
     // Relación con la Unidades de medida

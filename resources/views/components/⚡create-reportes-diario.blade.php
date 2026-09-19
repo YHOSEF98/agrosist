@@ -5,6 +5,8 @@ use App\Models\ReportesDiario;
 use App\Models\DetReportesDiario;
 use App\Models\Cuadrilla;
 use Illuminate\Support\Facades\DB;
+use App\Models\Labore;
+use App\Models\Invfruta;
 
 new class extends Component
 {
@@ -128,6 +130,7 @@ new class extends Component
     public function save()
 {
     $this->validate();
+    $labor = Labore::find($this->laborSeleccionada);
 
     if ($this->isEdit) {
         // Actualizar el reporte existente
@@ -140,6 +143,10 @@ new class extends Component
 
         // Eliminar detalles anteriores y volver a guardar
         $this->reporte->detalles()->delete();
+
+        // 👇 Eliminar invfrutas anteriores asociados a este reporte
+        Invfruta::where('reporte_id', $this->reporte->id)->delete();
+
         foreach ($this->detalles as $detalle) {
             $this->reporte->detalles()->create([
                 'acopios_id' => $detalle['acopio_id'] ?? null,
@@ -147,6 +154,15 @@ new class extends Component
                 'lineas' => $detalle['linea'] ?? null,
                 'cantidad' => $detalle['cantidad'],
             ]);
+            if ($labor && $labor->invfruta) {
+                $this->reporte->invfrutas()->create([
+                    'fecha' => $this->fecha,
+                    'lote_id' => $detalle['lote_id'],
+                    'acopio_id' => $detalle['acopio_id'] ?? null,
+                    'cantidad' => $detalle['cantidad'],
+                    'cargado' => false,
+                ]);
+            }
         }
     } else {
         // Crear nuevo reporte
@@ -164,10 +180,19 @@ new class extends Component
                 'lineas' => $detalle['linea'] ?? null,
                 'cantidad' => $detalle['cantidad'],
             ]);
+            if ($labor && $labor->invfruta) {
+                $reporte->invfrutas()->create([
+                    'fecha' => $this->fecha,
+                    'lote_id' => $detalle['lote_id'],
+                    'acopio_id' => $detalle['acopio_id'] ?? null,
+                    'cantidad' => $detalle['cantidad'],
+                    'cargado' => false,
+                ]);
+            }
         }
     }
 
-    return redirect()->route('reportes_diarios.index')->with('success', $this->isEdit ? 'Reporte actualizado exitosamente.' : 'Reporte creado exitosamente.');
+    return redirect()->route('reportes-diarios.index')->with('success', $this->isEdit ? 'Reporte actualizado exitosamente.' : 'Reporte creado exitosamente.');
 }
     
 };
@@ -331,7 +356,7 @@ new class extends Component
                     </div>
                 </div>
                 </div>
-</div>
+        </div>
 
                             <a href="{{ route('reportes-diarios.index') }}" class="btn btn-warning" type="button">
                                 <i class="bi bi-arrow-left-short"></i> Volver

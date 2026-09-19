@@ -22,6 +22,7 @@ return new class extends Migration
             $table->decimal('tarifa_personal_directo', 12, 2)->nullable();
             $table->decimal('valor_prestaciones', 12, 2)->nullable();
             $table->decimal('valor_total', 12, 2)->nullable();
+            $table->boolean('invfruta')->default(false);
             $table->text('observaciones')->nullable();
             $table->timestamps();
         });

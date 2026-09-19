@@ -141,7 +141,7 @@
 
                             <!-- Observaciones -->
                             <div class="row">
-                                <div class="col-md-12 mb-3">
+                                <div class="col-md-10 mb-3">
                                     <label for="observaciones" class="form-label">Observaciones:</label>
                                     <input type="text" step="0.01"
                                         class="form-control @error('observaciones') is-invalid @enderror" id="observaciones"
@@ -153,6 +153,15 @@
                                             {{ $message }}
                                         </div>
                                     @enderror
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label for="invfruta" class="form-label">Genera Inventario de Frutas</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="invfruta" name="invfruta" value="1" {{ old('invfruta', $labor->invfruta ?? '') ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="invfruta">
+                                            Si
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
 

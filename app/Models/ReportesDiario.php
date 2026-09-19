@@ -26,4 +26,9 @@ class ReportesDiario extends Model
     {
         return $this->hasMany(DetReportesDiario::class, 'reporte_diario_id');
     }
+
+    public function invfrutas()
+    {
+        return $this->hasMany(Invfruta::class, 'reporte_id');
+    }
 }
