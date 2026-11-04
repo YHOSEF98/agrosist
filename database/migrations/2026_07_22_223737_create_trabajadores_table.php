@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombres');
             $table->string('apellidos');
-            $table->string('tipo_documento', 6);
+            $table->foreignId('tipo_documento_id')->constrained('tipos_documentos')->onDelete('cascade');
             $table->string('numero_documento', 12)->unique();
             $table->date('fecha_ingreso');
             $table->string('email')->unique();
@@ -27,8 +27,8 @@ return new class extends Migration
             $table->foreignId('cargo_id')->constrained('cargos')->onDelete('cascade');
             $table->decimal('salario', 10, 2);
             $table->decimal('aux_transporte', 10, 2)->nullable();
-            $table->enum('estatus', ['activo', 'inactivo'])->default('activo');
-            $table->foreignId('empresa_id')->constrained('empresas')->onDelete('cascade');
+            $table->enum('estatus', ['Activo', 'Inactivo'])->default('activo');
+            $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
             $table->timestamps();
         });
     }

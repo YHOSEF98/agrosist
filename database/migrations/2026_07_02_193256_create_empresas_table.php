@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('empresas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('team_id')->constrained()->onDelete('cascade')->unique();
             $table->string('razon_social');
             $table->string('nombre_comercial')->nullable();
-            $table->string('tipo_contribuyente');
-            $table->string('tipo_documento');
+            $table->foreignId('tipo_documento_id')->constrained('tipos_documentos');
             $table->string('numero_documento')->unique();
-            $table->string('digito_verificacion')->nullable();
+            $table->integer('digito_verificacion')->nullable();
             $table->string('direccion')->nullable();
             $table->string('telefono', 20)->nullable();
             $table->string('email')->nullable();

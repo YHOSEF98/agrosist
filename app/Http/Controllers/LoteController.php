@@ -22,16 +22,17 @@ class LoteController extends Controller
      */
     public function create()
     {
+        $lote = null; // No hay lote existente al crear uno nuevo.
         $fincas = Finca::all();
-        return view('modules.lote.create', compact('fincas'));
+        return view('modules.lote.create', compact('lote', 'fincas'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(string $current_team, Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nombre' => 'required|string|max:255|unique:lotes,nombre',
             'ubicacion' => 'nullable|string|max:255',
             'cultivo' => 'nullable|string|max:255',
@@ -43,17 +44,10 @@ class LoteController extends Controller
             'nombre.unique' => 'Ya existe un lote registrado con ese nombre.',
         ]);
 
-        Lote::create([
-            'nombre' => $request->nombre,
-            'ubicacion' => $request->ubicacion,
-            'cultivo' => $request->cultivo,
-            'variedad' => $request->variedad,
-            'peso_prom' => $request->peso_prom,
-            'finca_id' => $request->finca_id,
-        ]);
+        Lote::create($validated);
 
         return redirect()
-            ->route('lotes')
+            ->route('lotes.index')
             ->with('success', 'Lote registrado correctamente.');
     }
 
@@ -68,9 +62,8 @@ class LoteController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $current_team, Lote $lote)
     {
-        $lote = Lote::findOrFail($id);
         $fincas = Finca::all();
         return view('modules.lote.create', compact('lote', 'fincas'));
     }
@@ -78,11 +71,9 @@ class LoteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $current_team, Lote $lote)
     {
-        $lote = Lote::findOrFail($id);
-
-        $request->validate([
+        $validated = $request->validate([
             'nombre' => 'required|string|max:255|unique:lotes,nombre,' . $lote->id,
             'ubicacion' => 'nullable|string|max:255',
             'cultivo' => 'nullable|string|max:255',
@@ -91,30 +82,22 @@ class LoteController extends Controller
             'finca_id' => 'required|exists:fincas,id',
         ]);
 
-        $lote->update([
-            'nombre' => $request->nombre,
-            'ubicacion' => $request->ubicacion,
-            'cultivo' => $request->cultivo,
-            'variedad' => $request->variedad,
-            'peso_prom' => $request->peso_prom,
-            'finca_id' => $request->finca_id,
-        ]);
+        $lote->update($validated);
 
         return redirect()
-            ->route('lotes')
+            ->route('lotes.index')
             ->with('success', 'Lote actualizado correctamente.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Lote $lote, string $current_team)
     {
-        $lote = Lote::findOrFail($id);
         $lote->delete();
 
         return redirect()
-            ->route('lotes')
+            ->route('lotes.index')
             ->with('success', 'Lote eliminado correctamente.');
     }
 }

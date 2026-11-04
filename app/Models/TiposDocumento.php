@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CategoriasLabore extends Model
+class TiposDocumento extends Model
 {
+    protected $table = 'tipos_documentos';
+
     protected $fillable = [
         'nombre',
-        'descripcion',
-        'activo',
+        'abreviatura',
     ];
 }

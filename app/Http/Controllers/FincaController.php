@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Finca;
-use App\Models\Empresa;
+use App\Models\Team;
 use Illuminate\Http\Request;
 
 class FincaController extends Controller
@@ -22,8 +22,9 @@ class FincaController extends Controller
      */
     public function create()
     {
-        $empresas = Empresa::all();
-        return view('modules.finca.create', compact('empresas'));
+        $finca = null; // No hay finca existente al crear una nueva
+        $teams = Team::all();
+        return view('modules.finca.create', compact('finca', 'teams'));
     }
 
     /**
@@ -32,25 +33,24 @@ class FincaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255|unique:fincas,nombre',
+            'nombre' => 'required|string|max:255',
             'ubicacion' => 'required|string|max:255',
-            'empresa_id' => 'required|exists:empresas,id',
+            'team_id' => 'required|exists:teams,id',
         ], [
             'nombre.required' => 'El nombre de la finca es obligatorio.',
-            'nombre.unique' => 'Ya existe una finca registrada con ese nombre.',
             'ubicacion.required' => 'La ubicación de la finca es obligatoria.',
-            'empresa_id.required' => 'Debe seleccionar una empresa para asociar la finca.',
-            'empresa_id.exists' => 'La empresa seleccionada no existe en el sistema.',
+            'team_id.required' => 'Debe seleccionar un equipo para asociar la finca.',
+            'team_id.exists' => 'El equipo seleccionado no existe en el sistema.',
         ]);
 
         Finca::create([
             'nombre' => $request->nombre,
             'ubicacion' => $request->ubicacion,
-            'empresa_id' => $request->empresa_id,
+            'team_id' => $request->team_id,
         ]);
 
         return redirect()
-            ->route('fincas')
+            ->route('fincas.index')
             ->with('success', 'Finca registrada correctamente.');
     }
 
@@ -66,53 +66,45 @@ class FincaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $current_team, Finca $finca)
     {
-        $empresas = Empresa::all();
-        $finca = Finca::findOrFail($id);
-        return view('modules.finca.create', compact('finca', 'empresas'));
+        $teams = Team::all();
+        return view('modules.finca.create', compact('finca', 'teams'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $current_team, Finca $finca)
     {
-        $finca = Finca::findOrFail($id);
-
-        $request->validate([
-            'nombre' => 'required|string|max:255|unique:fincas,nombre,' . $finca->id,
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
             'ubicacion' => 'required|string|max:255',
-            'empresa_id' => 'required|exists:empresas,id',
+            'team_id' => 'required|exists:teams,id',
         ], [
             'nombre.required' => 'El nombre de la finca es obligatorio.',
-            'nombre.unique' => 'Ya existe otra finca registrada con ese nombre.',
             'ubicacion.required' => 'La ubicación de la finca es obligatoria.',
-            'empresa_id.required' => 'Debe seleccionar una empresa para asociar la finca.',
-            'empresa_id.exists' => 'La empresa seleccionada no existe en el sistema.',
+            'team_id.required' => 'Debe seleccionar un equipo para asociar la finca.',
+            'team_id.exists' => 'El equipo seleccionado no existe en el sistema.',
         ]);
 
-        $finca->update([
-            'nombre' => $request->nombre,
-            'ubicacion' => $request->ubicacion,
-            'empresa_id' => $request->empresa_id,
-        ]);
+        $finca->update($validated);
 
         return redirect()
-            ->route('fincas')
+            ->route('fincas.index')
             ->with('success', 'Finca actualizada correctamente.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $current_team, Finca $finca)
     {
-        $finca = Finca::findOrFail($id);
+        $finca = Finca::findOrFail($finca->id);
         $finca->delete();
 
         return redirect()
-            ->route('fincas')
+            ->route('fincas.index')
             ->with('success', 'Finca eliminada correctamente.');
     }
 }

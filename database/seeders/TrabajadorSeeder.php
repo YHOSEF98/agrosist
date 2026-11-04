@@ -16,7 +16,7 @@ class TrabajadorSeeder extends Seeder
         Trabajador::firstOrCreate([
             'nombres' => 'Juan',
             'apellidos' => 'Perez',
-            'tipo_documento' => 'CC',
+            'tipo_documento_id' => 1,
             'numero_documento' => '12345678',
             'fecha_ingreso' => now(),
             'email' => 'juan.perez@example.com',
@@ -25,16 +25,16 @@ class TrabajadorSeeder extends Seeder
             'direccion' => 'Calle Principal 123',
             'persona_contacto' => 'María García',
             'telefono_persona_contacto' => '987654321',
-            'cargo_id' => '1',
+            'cargo_id' => 1,
             'salario' => '1000.00',
-            'aux_transporte' => '200.00',
-            'empresa_id' => '1',
+            'aux_transporte' => '200000.00',
+            'team_id' => 1,
             'estatus' => 'activo',
         ]);
         Trabajador::firstOrCreate([
             'nombres' => 'yhosef',
             'apellidos' => 'Perez',
-            'tipo_documento' => 'CC',
+            'tipo_documento_id' => 1,
             'numero_documento' => '123456789',
             'fecha_ingreso' => now(),
             'email' => 'yhosef.perez@example.com',
@@ -43,10 +43,10 @@ class TrabajadorSeeder extends Seeder
             'direccion' => 'Calle Principal 123',
             'persona_contacto' => 'María García',
             'telefono_persona_contacto' => '987654321',
-            'cargo_id' => '1',
+            'cargo_id' => 1,
             'salario' => '1000.00',
-            'aux_transporte' => '200.00',
-            'empresa_id' => '1',
+            'aux_transporte' => '200000.00',
+            'team_id' => 1,
             'estatus' => 'activo',
         ]);
 

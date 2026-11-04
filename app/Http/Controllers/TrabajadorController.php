@@ -4,18 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Trabajador;
 use App\Models\Cargo;
-use App\Enums\TipoDocumento;
+use App\Models\TiposDocumento;
 use App\Models\Empresa;
+use App\Models\Team;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class TrabajadorController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(string $current_team)
     {
         $trabajadores = Trabajador::all();
         return view('modules.trabajadores.index', compact('trabajadores'));
@@ -24,22 +26,24 @@ class TrabajadorController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(string $current_team)
     {
+        $trabajador = null;
+        $tipos_documento = TiposDocumento::all();
         $cargos = Cargo::all();
-        $empresas = Empresa::all();
-        return view('modules.trabajadores.create', compact('cargos','empresas'));
+        $teams = Auth::user()->teams;
+        return view('modules.trabajadores.create', compact('trabajador','tipos_documento','cargos','teams'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store( string $current_team, Request $request)
 {
     $validated = $request->validate([
         'nombres' => 'required|string|max:100',
         'apellidos' => 'required|string|max:100',
-        'tipo_documento' => ['required', new Enum(TipoDocumento::class),],
+        'tipo_documento_id' => 'required|exists:tipos_documentos,id',
         'numero_documento' => 'required|string|max:20|unique:trabajadores,numero_documento',
         'fecha_ingreso' => 'required|date',
         'email' => 'nullable|email|max:100|unique:trabajadores,email',
@@ -51,7 +55,8 @@ class TrabajadorController extends Controller
         'cargo_id' => 'required|exists:cargos,id',
         'salario' => 'required|numeric|min:0',
         'aux_transporte' => 'nullable|numeric|min:0',
-        'empresa_id' => 'required|exists:empresas,id',
+        'estatus' => 'required|string|in:Activo,Inactivo',
+        'team_id' => 'required|exists:teams,id',
     ]);
 
     Trabajador::create($validated);
@@ -72,25 +77,23 @@ class TrabajadorController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $current_team, Trabajador $trabajador)
     {
         $cargos = Cargo::all();
-        $empresas = Empresa::all();
-        $trabajador = Trabajador::findOrFail($id);
-        return view('modules.trabajadores.create', compact('trabajador','cargos','empresas'));
-
+        $tipos_documento = TiposDocumento::all();
+        $teams = Auth::user()->teams;
+        return view('modules.trabajadores.create', compact('trabajador','cargos','tipos_documento','teams'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $current_team, Trabajador $trabajador)
     {
-        $trabajador = Trabajador::findOrFail($id);
-        $request->validate([
+        $validated = $request->validate([
         'nombres' => 'required|string|max:100',
         'apellidos' => 'required|string|max:100',
-        'tipo_documento' => ['required', new Enum(TipoDocumento::class),],
+        'tipo_documento_id' => 'required|exists:tipos_documentos,id',
         'numero_documento' => ['required','string','max:20',Rule::unique('trabajadores')->ignore($trabajador->id),],
         'fecha_ingreso' => 'required|date',
         'email' => ['nullable','email','max:100',Rule::unique('trabajadores')->ignore($trabajador->id),],
@@ -102,25 +105,9 @@ class TrabajadorController extends Controller
         'cargo_id' => 'required|exists:cargos,id',
         'salario' => 'required|numeric|min:0',
         'aux_transporte' => 'nullable|numeric|min:0',
-        'empresa_id' => 'required|exists:empresas,id',
+        'team_id' => 'required|exists:teams,id',
     ]);
-        $trabajador->update([
-            'nombres' => $request->nombres,
-            'apellidos' => $request->apellidos,
-            'tipo_documento' => $request->tipo_documento,
-            'numero_documento' => $request->numero_documento,
-            'fecha_ingreso' => $request->fecha_ingreso,
-            'email' => $request->email,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-            'telefono' => $request->telefono,
-            'direccion' => $request->direccion,
-            'persona_contacto' => $request->persona_contacto,
-            'telefono_persona_contacto' => $request->telefono_persona_contacto,
-            'cargo_id' => $request->cargo_id,
-            'salario' => $request->salario,
-            'aux_transporte' => $request->aux_transporte,
-            'empresa_id' => $request->empresa_id,
-            ]);
+        $trabajador->update($validated);
 
             return redirect()
             ->route('trabajadores.index')
@@ -130,12 +117,11 @@ class TrabajadorController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $current_team, Trabajador $trabajador)
     {
-        $trabajador = Trabajador::findOrFail($id);
         $trabajador->delete();
         return redirect()
             ->route('trabajadores.index')
-            ->with('success', 'Trabajador actualizado correctamente.');
+            ->with('success', 'Trabajador eliminado correctamente.');
     }
 }

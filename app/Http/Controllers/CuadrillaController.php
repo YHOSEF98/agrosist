@@ -24,18 +24,19 @@ class CuadrillaController extends Controller
      */
     public function create()
     {
+        $cuadrilla = null;
         $labores = Labore::all();
         $trabajadores = Trabajador::all();
-        return view('modules.cuadrilla.create', compact('labores', 'trabajadores'));
+        return view('modules.cuadrilla.create', compact('labores', 'trabajadores', 'cuadrilla'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, string $current_team)
     {
         // Validación básica de la cuadrilla
-        $request->validate([
+        $validated = $request->validate([
             'fecha' => 'required|date',
             'nombre' => 'required|string|max:255',
             'labore_id' => 'required|exists:labores,id',
@@ -59,12 +60,7 @@ class CuadrillaController extends Controller
         }
 
         // Crear la cuadrilla
-        $cuadrilla = Cuadrilla::create([
-            'fecha' => $request->fecha,
-            'nombre' => $request->nombre,
-            'labore_id' => $request->labore_id,
-            'observacion' => $request->observacion,
-        ]);
+        $cuadrilla = Cuadrilla::create($validated);
 
         // Asignar trabajadores a la cuadrilla (tabla intermedia)
         foreach ($request->trabajadores as $trabajador) {
@@ -88,20 +84,20 @@ class CuadrillaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $current_team, Cuadrilla $cuadrilla)
     {
         $labores = Labore::all();
-        $cuadrilla = Cuadrilla::with('trabajadores')->findOrFail($id);
+        $cuadrilla = Cuadrilla::with('trabajadores')->findOrFail($cuadrilla->id);
         return view('modules.cuadrilla.create', compact('cuadrilla', 'labores', 'cuadrilla'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $current_team, Cuadrilla $cuadrilla)
     {
         // Validación básica
-        $request->validate([
+        $validated = $request->validate([
             'fecha' => 'required|date',
             'nombre' => 'required|string|max:255',
             'labore_id' => 'required|exists:labores,id',
@@ -110,7 +106,7 @@ class CuadrillaController extends Controller
             'trabajadores.*.id' => 'exists:trabajadores,id',
         ]);
 
-        $cuadrilla = Cuadrilla::findOrFail($id);
+        $cuadrilla = Cuadrilla::findOrFail($cuadrilla->id);
 
         // Validar que cada trabajador no esté ya asignado en esa fecha a otra cuadrilla
         foreach ($request->trabajadores as $trabajadorId) {
@@ -128,12 +124,7 @@ class CuadrillaController extends Controller
         }
 
         // Actualizar datos de la cuadrilla
-        $cuadrilla->update([
-            'fecha' => $request->fecha,
-            'nombre' => $request->nombre,
-            'labore_id' => $request->labore_id,
-            'observacion' => $request->observacion,
-        ]);
+        $cuadrilla->update($validated);
 
         // Actualizar trabajadores en la tabla intermedia
         $syncData = [];
@@ -150,8 +141,11 @@ class CuadrillaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Cuadrilla $cuadrilla)
+    public function destroy(string $current_team, Cuadrilla $cuadrilla)
     {
-        //
+        $cuadrilla->delete(); // Eliminar la cuadrilla
+
+        return redirect()->route('cuadrillas.index')
+            ->with('success', 'Cuadrilla eliminada correctamente.');
     }
 }

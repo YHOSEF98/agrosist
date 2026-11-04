@@ -17,20 +17,69 @@
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
-                </flux:sidebar.group>
+
+                    <flux:sidebar.group expandable :expanded="false" icon="clipboard-document-list" heading="Reportes" class="grid">
+                        <flux:sidebar.item icon="clipboard-document-check" href="{{ route('reportes-diarios.index') }}" :current="request()->routeIs('reportes-diarios.index')" wire:navigate>
+                            {{ __('Reportes diarios') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="squares-2x2" href="#" :current="request()->routeIs('alce-fruto.index')" wire:navigate>
+                            {{ __('Alce de fruto') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="user-circle" href="{{ route('cuadrillas.index') }}" :current="request()->routeIs('cuadrillas.index')" wire:navigate>
+                            {{ __('Equipos de trabajo') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="calendar-days" href="#">Pluviometria</flux:sidebar.item>
+                </flux:sidebar.group">
+
+                <flux:sidebar.group expandable :expanded="false" icon="user-group" heading="Usuarios" class="grid">
+                        <flux:sidebar.item icon="users" href="#">Usuarios</flux:sidebar.item>
+                        <flux:sidebar.item icon="identification" href="{{ route('trabajadores.index') }}" :current="request()->routeIs('trabajadores.index')" wire:navigate>
+                            {{ __('Trabajadores') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="user-plus" href="#">Proveedores</flux:sidebar.item>
+                        <flux:sidebar.item icon="truck" href="#">Conductores</flux:sidebar.item>
+                </flux:sidebar.group">
+                
+                <flux:sidebar.group :heading="__('Empresariales')" class="grid">
+                    <flux:sidebar.group expandable :expanded="false" icon="cog-6-tooth" heading="Configuraciones" class="grid">
+                        <flux:sidebar.item icon="archive-box" href="{{ route('acopios.index') }}" :current="request()->routeIs('acopios.index')" wire:navigate>
+                            {{ __('Acopios') }}</flux:sidebar.item>
+                        <flux:sidebar.item icon="square-3-stack-3d" href="{{ route('areas.index') }}" :current="request()->routeIs('areas.index')" wire:navigate>
+                            {{ __('Areas') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="briefcase" href="{{ route('cargos.index') }}" :current="request()->routeIs('cargos.index')" wire:navigate>
+                            {{ __('Cargos') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="building-office-2" :href="route('empresa.index')" :current="request()->routeIs('empresa.index')" wire:navigate>
+                        {{ __('Empresa') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="map" href="{{ route('fincas.index') }}" :current="request()->routeIs('fincas.index')" wire:navigate>
+                            {{ __('Fincas') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="squares-2x2" href="{{ route('lotes.index') }}" :current="request()->routeIs('lotes.index')" wire:navigate>
+                            {{ __('Lotes') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="wrench-screwdriver" href="{{ route('labores.index') }}" :current="request()->routeIs('labores.index')" wire:navigate>
+                            {{ __('Labores') }}
+                        </flux:sidebar.item>
+                </flux:sidebar.group">
+                </flux:navlist.group>
+
+                <flux:sidebar.group :heading="__('Seguridad')" class="grid">
+                    <flux:sidebar.group expandable :expanded="false" icon="lock-closed" heading="Seguridad" class="grid">
+                        <flux:sidebar.item icon="adjustments-horizontal" :href="route('roles.index')" :current="request()->routeIs('roles.index')" wire:navigate>
+                        {{ __('Roles') }}
+                        </flux:sidebar.item>
+                </flux:sidebar.group">
+                </flux:navlist.group>
+                </flux:sidebar.group">       
+                
+                
+                
             </flux:sidebar.nav>
+            
 
             <flux:spacer />
-
-            <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    {{ __('Repository') }}
-                </flux:sidebar.item>
-
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                    {{ __('Documentation') }}
-                </flux:sidebar.item>
-            </flux:sidebar.nav>
 
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
         </flux:sidebar>

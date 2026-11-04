@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Models;
-use App\Enums\TipoDocumento;
+use App\Models\TiposDocumento;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +12,7 @@ class Trabajador extends Model
     protected $fillable = [
         'nombres',
         'apellidos',
-        'tipo_documento',
+        'tipo_documento_id',
         'numero_documento',
         'fecha_ingreso',
         'email',
@@ -24,11 +25,21 @@ class Trabajador extends Model
         'salario',
         'aux_transporte',
         'estatus',
-        'empresa_id', // Add this line to allow mass assignment for aux_transporte
+        'team_id', // Add this line to allow mass assignment for aux_transporte
     ];
-    protected $casts = [
-        'tipo_documento' => TipoDocumento::class,
-    ];
+    protected function nombres(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => mb_convert_case(trim($value), MB_CASE_TITLE, 'UTF-8')
+        );
+    }
+
+    protected function apellidos(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => mb_convert_case(trim($value), MB_CASE_TITLE, 'UTF-8')
+        );
+    }
 
     public function scopeActivos($query)
     {
@@ -36,9 +47,17 @@ class Trabajador extends Model
     }
 
     // Relación con la empresa
-    public function empresa()
+    public function Team()
     {
-        return $this->belongsTo(Empresa::class);
+        return $this->belongsTo(Team::class);
+    }
+    public function tipo_documento()
+    {
+        return $this->belongsTo(TiposDocumento::class);
+    }
+    public function cargo()
+    {
+        return $this->belongsTo(Cargo::class);
     }
 
     public function cuadrillas()

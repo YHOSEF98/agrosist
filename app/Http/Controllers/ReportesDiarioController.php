@@ -24,10 +24,11 @@ class ReportesDiarioController extends Controller
      */
     public function create()
     {
+        $reporte = null;
         $lotes = Lote::all();
         $acopios = Acopio::all();
         $labores = Labore::all();
-        return view('modules.reporte_diario.create', compact('labores', 'lotes', 'acopios'));
+        return view('modules.reporte_diario.create', compact('labores', 'lotes', 'acopios','reporte'));
     }
 
     /**
@@ -49,10 +50,10 @@ class ReportesDiarioController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $current_team, ReportesDiario $reportesDiario)
     {
     // Buscar el reporte por ID
-    $reporte = ReportesDiario::with(['cuadrilla', 'detalles'])->findOrFail($id);
+    $reporte = ReportesDiario::with(['cuadrilla', 'detalles'])->findOrFail($reportesDiario->id);
 
     // Traer las colecciones necesarias para los selects
     $lotes = Lote::all();
@@ -74,8 +75,10 @@ class ReportesDiarioController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ReportesDiario $reportesDiario)
+    public function destroy(string $current_team, ReportesDiario $reportesDiario)
     {
-        //
+        $reportesDiario->delete();
+        return redirect()->route('reportes-diarios.index')
+            ->with('success', 'Reporte diario eliminado correctamente.');
     }
 }

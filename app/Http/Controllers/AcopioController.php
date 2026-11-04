@@ -22,16 +22,17 @@ class AcopioController extends Controller
      */
     public function create()
     {
+        $acopio = null;
         $fincas = Finca::all();
-        return view('modules.acopio.create', compact('fincas'));
+        return view('modules.acopio.create', compact('acopio', 'fincas'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, string $current_team)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nombre' => 'required|string|max:255|unique:acopios,nombre',
             'estado' => 'nullable|boolean',
             'finca_id' => 'required|exists:fincas,id',
@@ -42,14 +43,10 @@ class AcopioController extends Controller
             'finca_id.exists' => 'La finca seleccionada no es válida.',
         ]);
 
-        Acopio::create([
-            'nombre' => $request->nombre,
-            'estado' => $request->estado ?? true,
-            'finca_id' => $request->finca_id,
-        ]);
+        Acopio::create($validated);
 
         return redirect()
-            ->route('acopios')
+            ->route('acopios.index')
             ->with('success', 'Acopio registrado correctamente.');
     }
 
@@ -64,19 +61,18 @@ class AcopioController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $current_team, Acopio $acopio)
     {
-        $acopio = Acopio::findOrFail($id);
-        return view('modules.acopio.create', compact('acopio'));
+        $fincas = Finca::all();
+        return view('modules.acopio.create', compact('acopio', 'fincas'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $current_team, Acopio $acopio)
     {
-        $acopio = Acopio::findOrFail($id);
-        $request->validate([
+        $validated = $request->validate([
             'nombre' => 'required|string|max:255|unique:acopios,nombre,' . $acopio->id,
             'estado' => 'nullable|boolean',
             'finca_id' => 'required|exists:fincas,id',
@@ -85,27 +81,22 @@ class AcopioController extends Controller
             'nombre.unique' => 'Ya existe un acopio registrado con ese nombre.',
         ]);
 
-        $acopio->update([
-            'nombre' => $request->nombre,
-            'estado' => $request->estado ?? true,
-            'finca_id' => $request->finca_id,
-        ]);
+        $acopio->update($validated);
 
         return redirect()
-            ->route('acopios')
+            ->route('acopios.index')
             ->with('success', 'Acopio actualizado correctamente.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $current_team, Acopio $acopio)
     {
-        $acopio = Acopio::findOrFail($id);
         $acopio->delete();
 
         return redirect()
-            ->route('acopios')
+            ->route('acopios.index')
             ->with('success', 'Acopio eliminado correctamente.');
     }
 }

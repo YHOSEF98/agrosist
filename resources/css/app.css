@@ -61,6 +61,16 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
-/* \[:where(&)\]:size-4 {
-    @apply size-4;
-} */
+@layer components {
+    .btn-create {
+        background-color: #6d28d9 !important;
+        color: #ffffff !important;
+        border-color: #6d28d9 !important;
+        transition: background-color 200ms ease;
+    }
+
+    .btn-create:hover {
+        background-color: #5b21b6 !important;
+        border-color: #5b21b6 !important;
+    }
+}

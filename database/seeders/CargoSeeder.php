@@ -23,5 +23,6 @@ class CargoSeeder extends Seeder
         Cargo::firstOrCreate(['nombre' => 'Asistente Administrativo']);
         Cargo::firstOrCreate(['nombre' => 'Jefe de Producción']);
         Cargo::firstOrCreate(['nombre' => 'Encargado de Logística']);
+        Cargo::firstOrCreate(['nombre' => 'Recolector de fruto']);
     }
 }

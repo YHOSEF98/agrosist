@@ -1,78 +1,193 @@
-<div class="card mb-4">
-                  <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title mb-0">Trabajadores asignados a la cuadrilla</h3>
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalTrabajador">
-                        <i class="bi bi-plus"></i> Añadir trabajador
-                    </button>
-                </div>
-                  <!-- /.card-header -->
-                  <div class="card-body p-0">
-                    <table class="table table-striped" role="table">
-                      <thead>
-                        <tr>
-                          <th style="width: 10px" scope="col">#</th>
-                          <th scope="col">Nombres</th>
-                          <th scope="col">Apellidos</th>
-                          <th style="width: 40px" scope="col">Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @forelse ( $trabajadores as $trabajador )
-                        <tr class="align-middle">
-                            <th scope="row">{{ $trabajador['id'] }}</th>
-                            <td>{{ $trabajador['nombres'] }}</td>
-                            <td>{{ $trabajador['apellidos'] }}</td>
-                            <td>
-                                <div class="btn-group" role="group">
+<div class="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
 
-                                    <!-- Botón de Eliminar -->
-                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Eliminar" wire:click="eliminartrabajador({{ $trabajador['id'] }})"   >
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+    {{-- Encabezado --}}
+    <div class="flex flex-col gap-3 border-b border-zinc-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-700">
+
+        <div>
+            <flux:heading size="lg">
+                Trabajadores asignados a la cuadrilla
+            </flux:heading>
+
+            <flux:text size="sm" class="mt-1">
+                Administra los trabajadores que pertenecen a esta cuadrilla.
+            </flux:text>
+        </div>
+
+        <flux:button type="button" variant="primary" class="btn-create" icon="plus" x-on:click="$flux.modal('modal-trabajador').show()">
+            Añadir trabajador
+        </flux:button>
+
+    </div>
+
+    {{-- Tabla de trabajadores --}}
+    <div class="overflow-x-auto">
+
+        <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
+
+            <thead class="bg-zinc-50 dark:bg-zinc-800/70">
+                <tr>
+                    <th scope="col" class="w-16 px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                        #
+                    </th>
+
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                        Nombres
+                    </th>
+
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                        Apellidos
+                    </th>
+
+                    <th scope="col" class="w-24 px-5 py-3 text-center text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+
+                @forelse ( $trabajadores as $trabajador )
+
+                    <tr
+                        wire:key="trabajador-{{ $trabajador['id'] }}"
+                        class="transition-colors hover:bg-violet-50/50 dark:hover:bg-zinc-800/50"
+                    >
+
+                        <th scope="row" class="whitespace-nowrap px-5 py-3.5 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                            {{ $trabajador['id'] }}
+                        </th>
+
+                        <td class="whitespace-nowrap px-5 py-3.5 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                            {{ $trabajador['nombres'] }}
+                        </td>
+
+                        <td class="whitespace-nowrap px-5 py-3.5 text-sm text-zinc-600 dark:text-zinc-300">
+                            {{ $trabajador['apellidos'] }}
+                        </td>
+
+                        <td class="whitespace-nowrap px-5 py-3.5 text-center">
+
+                            <div class="flex items-center justify-center gap-2">
+
+                                <flux:button type="button" variant="ghost"
+                                    size="sm" icon="trash" color="danger" title="Eliminar"
+                                    wire:click="eliminartrabajador({{ $trabajador['id'] }})"/>
+
+                            </div>
+
+                        </td>
+
+                        <input
+                            type="hidden"
+                            name="trabajadores[{{ $trabajador['id'] }}][id]"
+                            value="{{ $trabajador['id'] }}"
+                        >
+
+                    </tr>
+
+                @empty
+
+                    <tr>
+                        <td colspan="4" class="px-5 py-10 text-center">
+
+                            <div class="flex flex-col items-center justify-center gap-2">
+
+                                <div class="flex size-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
+                                    <flux:icon name="users" class="size-6 text-zinc-400" />
                                 </div>
-                            </td>
-                            <input type="hidden" name="trabajadores[{{ $trabajador['id'] }}][id]" value="{{ $trabajador['id'] }}">
-                        </tr>
-                         @empty
-                                    <!-- Este bloque se activa automáticamente si no hay Trabajadores en la base de datos -->
-                                    <tr>
-                                        <td colspan="4" class="text-center py-4 text-muted">
-                                            <i class="bi bi-info-circle me-1"></i> No hay trabajadores asignados actualmente
-                                        </td>
-                                    </tr>
-                        @endforelse
-                      </tbody>
-                    </table>
-                  </div>
-                  <!-- /.card-body -->
-                  <!-- Modal -->
-                <div wire:ignore.self class="modal fade" id="modalTrabajador" tabindex="-1" aria-labelledby="modalTrabajadorLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalTrabajadorLabel">Seleccionar trabajador</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                        <label for="trabajador_id" class="form-label">Trabajador disponible</label>
-                        <select id="trabajador_id" class="form-select" wire:model="trabajadorSeleccionado">
-                            <option value="">Seleccione...</option>
-                            @foreach($trabajadoresDisponibles as $trabajador)
-                                <option value="{{ $trabajador->id }}">
-                                    {{ $trabajador->nombres }} {{ $trabajador->apellidos }}
-                                </option>
-                            @endforeach
-                        </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary" wire:click="agregarTrabajador" data-bs-dismiss="modal">
-                        Añadir
-                        </button>
-                    </div>
-                    </div>
-                </div>
-                </div>
+
+                                <flux:heading size="sm">
+                                    No hay trabajadores asignados
+                                </flux:heading>
+
+                                <flux:text size="sm">
+                                    Actualmente no hay trabajadores en esta cuadrilla.
+                                </flux:text>
+
+                            </div>
+
+                        </td>
+                    </tr>
+
+                @endforelse
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {{-- Modal para añadir trabajador --}}
+    <flux:modal name="modal-trabajador" class="md:w-120">
+
+        <div class="space-y-6">
+
+            <div>
+                <flux:heading size="lg">
+                    Añadir trabajador
+                </flux:heading>
+
+                <flux:text size="sm" class="mt-1">
+                    Selecciona el trabajador que deseas asignar a esta cuadrilla.
+                </flux:text>
+            </div>
+
+            <div>
+                <flux:field>
+
+                    <flux:label for="trabajador_id">
+                        Trabajador
+                    </flux:label>
+
+                    <flux:select
+                        id="trabajador_id"
+                        wire:model="trabajadorSeleccionado"
+                        placeholder="Seleccione un trabajador..."
+                    >
+                        <option value="">Seleccione...</option>
+
+                        @foreach($trabajadoresDisponibles as $trabajador)
+
+                            <option value="{{ $trabajador->id }}">
+                                {{ $trabajador->nombres }} {{ $trabajador->apellidos }}
+                            </option>
+
+                        @endforeach
+
+                    </flux:select>
+
+                </flux:field>
+            </div>
+
+            <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+
+                <flux:modal.close>
+                    <flux:button variant="ghost">
+                        Cancelar
+                    </flux:button>
+                </flux:modal.close>
+
+                <flux:button
+                    type="button"
+                    variant="primary"
+                    class="btn-create"
+                    icon="plus"
+                    wire:click="agregarTrabajador"
+                    wire:loading.attr="disabled"
+                >
+                    <span wire:loading.remove wire:target="agregarTrabajador">
+                        Añadir trabajador
+                    </span>
+
+                    <span wire:loading wire:target="agregarTrabajador">
+                        Añadiendo...
+                    </span>
+                </flux:button>
+
+            </div>
+
+        </div>
+
+    </flux:modal>
+
 </div>

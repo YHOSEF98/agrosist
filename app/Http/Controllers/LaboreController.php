@@ -22,21 +22,21 @@ class LaboreController extends Controller
      */
     public function create()
     {
-        
+        $labore= null;        
         $unidadesm = UnidadMedida::all();
-        return view('modules.labores.create', compact('unidadesm'));
+        return view('modules.labores.create', compact('unidadesm', 'labore'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, string $current_team)
     {
-        $request->validate([
+        $validate = $request->validate([
             'actividad' => 'required|string|max:255|unique:labores,actividad',
             'unidad_medida_id' => 'required|exists:unidad_medidas,id',
-            'rendimiento_esperado' => 'required',
-            'valor_unitario' => 'required',
+            'rendimiento_esperado' => 'required|decimal:0,2',
+            'valor_unitario' => 'required|decimal:0,2',
             'tarifa_contratista' => 'nullable|decimal:0,2',
             'tarifa_personal_directo' => 'nullable|decimal:0,2',
             'valor_prestaciones' => 'nullable|decimal:0,2',
@@ -52,18 +52,7 @@ class LaboreController extends Controller
             'unidad_medida_id.exists' => 'La unidad de medida seleccionada no existe en el sistema.',
         ]);
 
-        Labore::create([
-            'actividad' => $request->actividad,
-            'unidad_medida_id' => $request->unidad_medida_id,
-            'rendimiento_esperado' => $request->rendimiento_esperado,
-            'valor_unitario' => $request->valor_unitario,
-            'tarifa_contratista' => $request->tarifa_contratista,
-            'tarifa_personal_directo' => $request->tarifa_personal_directo,
-            'valor_prestaciones' => $request->valor_prestaciones,
-            'valor_total' => $request->valor_total,
-            'observaciones' => $request->observaciones,
-            'invfruta' => $request->invfruta,
-        ]);
+        Labore::create($validate);
 
         return redirect()
             ->route('labores.index')
@@ -81,20 +70,18 @@ class LaboreController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $current_team, Labore $labore)
     {
-        $labor = Labore::findOrFail($id);
         $unidadesm = UnidadMedida::all();
-        return view('modules.labores.create', compact('labor', 'unidadesm'));
+        return view('modules.labores.create', compact('labore', 'unidadesm'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $current_team, Labore $labore)
     {
-        $labore = Labore::findOrFail($id);
-        $request->validate([
+        $validate = $request->validate([
             'actividad' => 'required|string|max:255|unique:labores,actividad,' . $labore->id,
             'unidad_medida_id' => 'required|exists:unidad_medidas,id',
             'rendimiento_esperado' => 'required',
@@ -114,18 +101,7 @@ class LaboreController extends Controller
             'unidad_medida_id.exists' => 'La unidad de medida seleccionada no existe en el sistema.',
         ]);
 
-        $labore->update([
-            'actividad' => $request->actividad,
-            'unidad_medida_id' => $request->unidad_medida_id,
-            'rendimiento_esperado' => $request->rendimiento_esperado,
-            'valor_unitario' => $request->valor_unitario,
-            'tarifa_contratista' => $request->tarifa_contratista,
-            'tarifa_personal_directo' => $request->tarifa_personal_directo,
-            'valor_prestaciones' => $request->valor_prestaciones,
-            'valor_total' => $request->valor_total,
-            'observaciones' => $request->observaciones,
-            'invfruta' => $request->invfruta,
-        ]);
+        $labore->update($validate);
 
         return redirect()
             ->route('labores.index')
@@ -135,9 +111,8 @@ class LaboreController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $current_team, Labore $labore)
     {
-        $labore = Labore::findOrFail($id);
         $labore->delete();
 
         return redirect()

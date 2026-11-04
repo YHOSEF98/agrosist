@@ -9,12 +9,12 @@ class Finca extends Model
     protected $fillable = [
         'nombre',
         'ubicacion',
-        'empresa_id', // Relación con la empresa
+        'team_id', // Relación con la empresa
     ];
 
     // Relación con la empresa
-    public function empresa()
+    public function team()
     {
-        return $this->belongsTo(Empresa::class);
+        return $this->belongsTo(Team::class);
     }
 }

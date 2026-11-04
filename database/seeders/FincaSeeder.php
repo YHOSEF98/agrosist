@@ -16,13 +16,13 @@ class FincaSeeder extends Seeder
         Finca::firstOrCreate([
             'nombre' => 'El Nispero',
             'ubicacion' => 'Santa Teresa',
-            'empresa_id' => '1',
+            'team_id' => '1',
         ]);
 
         Finca::firstOrCreate([
             'nombre' => 'El limon',
             'ubicacion' => 'cienaga el limon',
-            'empresa_id' => '2',
+            'team_id' => '2',
         ]);
     }
 }

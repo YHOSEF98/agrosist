@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CategoriasLabore;
+use App\Models\TiposDocumento;
 use Illuminate\Http\Request;
 
-class CategoriasLaboreController extends Controller
+class TiposDocumentoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class CategoriasLaboreController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(CategoriasLabore $categoriasLabore)
+    public function show(TiposDocumento $tiposDocumento)
     {
         //
     }
@@ -42,7 +42,7 @@ class CategoriasLaboreController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(CategoriasLabore $categoriasLabore)
+    public function edit(TiposDocumento $tiposDocumento)
     {
         //
     }
@@ -50,7 +50,7 @@ class CategoriasLaboreController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, CategoriasLabore $categoriasLabore)
+    public function update(Request $request, TiposDocumento $tiposDocumento)
     {
         //
     }
@@ -58,7 +58,7 @@ class CategoriasLaboreController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(CategoriasLabore $categoriasLabore)
+    public function destroy(TiposDocumento $tiposDocumento)
     {
         //
     }

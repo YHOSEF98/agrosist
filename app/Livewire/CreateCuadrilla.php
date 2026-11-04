@@ -3,6 +3,7 @@
 namespace App\Livewire;
 use App\Models\Trabajador;
 use Livewire\Attributes\On;
+use Flux\Flux;
 
 use Livewire\Component;
 
@@ -16,7 +17,18 @@ class CreateCuadrilla extends Component
     #[On('fechaActualizada')]
     public function actualizarFecha($fecha)
     {
-        $this->fecha = $fecha;
+       // Comprobar si realmente cambió la fecha
+        if ($this->fecha !== $fecha) {
+
+            // Actualizar la fecha
+            $this->fecha = $fecha;
+
+            // Eliminar todos los trabajadores seleccionados
+            $this->trabajadores = [];
+
+            // Limpiar cualquier selección pendiente
+            $this->trabajadorSeleccionado = null;
+        }
     }
 
     public function mount($fechaInicial = null, $trabajadoresIniciales = [])
@@ -27,6 +39,11 @@ class CreateCuadrilla extends Component
 
     public function getTrabajadoresDisponiblesProperty()
     {
+        // Si no hay fecha seleccionada, no mostrar trabajadores.
+        if (empty($this->fecha)) {
+            return collect();
+        }
+
         $idsSeleccionados = collect($this->trabajadores)
             ->pluck('id')
             ->toArray();
@@ -53,6 +70,7 @@ class CreateCuadrilla extends Component
             ];
 
             $this->trabajadorSeleccionado = null;
+            Flux::modal('modal-trabajador')->close();
         }
     }
 

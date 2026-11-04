@@ -7,6 +7,7 @@ use App\Models\Cuadrilla;
 use Illuminate\Support\Facades\DB;
 use App\Models\Labore;
 use App\Models\Invfruta;
+use Flux\Flux;
 
 new class extends Component
 {
@@ -106,6 +107,7 @@ new class extends Component
         ];
         // limpiar campos del modal
         $this->reset(['loteSeleccionado','acopioSeleccionado','lineasSeleccionadas','cantidadSeleccionada']);
+        Flux::modal('modal-registro')->close();
     }
 
     public function eliminarDetalle($index)
@@ -198,173 +200,376 @@ new class extends Component
 };
 ?>
 
-<div class="card-body">
+<div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
 
-                        <form wire:submit.prevent="save">
-                            @csrf
-                            @if ($isEdit)
-                                @method('PUT')
-                            @endif
-                            <!-- Fecha y nombre -->
+    <form wire:submit.prevent="save">
+        @csrf
 
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                <label for="fecha" class="form-label">Fecha</label>
-                                    <input type="date" id="fecha" name="fecha" wire:model="fecha"
-                                    class="form-control @error('fecha') is-invalid @enderror"
-                                    value="{{ old('fecha', $reporte->fecha ?? '') }}"
-                                    onchange="Livewire.dispatch('fechaActualizada', { fecha: this.value })">
-                                @error('fecha')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                </div>
-                                <!-- cuadrilla asociada -->
-                                <div class="col-md-4 mb-3">
-                                <label for="cuadrilla_id" class="form-label">Cuadrilla</label>
-                                <select
-                                    id="cuadrilla_id"
-                                    name="cuadrilla_id"
-                                    wire:model.live="cuadrillaSeleccionada"
-                                    class="form-select @error('cuadrilla_id') is-invalid @enderror"
-                                >
-                                    <option value="">Seleccione...</option>
+        @if (isset($reporte) && $reporte)
+            @method('PUT')
+        @endif
 
-                                    @foreach ($cuadrillas as $cuadrilla)
-                                        <option value="{{ $cuadrilla->id }}">
-                                            {{ $cuadrilla->nombre }}
-
-                                            @if($cuadrilla->trabajadores->isNotEmpty())
-                                                - [{{ $cuadrilla->trabajadores->pluck('nombres')->join(', ') }}]
-                                            @else
-                                                - [Sin trabajadores]
-                                            @endif
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                                <!-- Labor asociada -->
-                            <div class="col-md-4 mb-3">
-                            <label for="labor_nombre" class="form-label">Labor</label>
-                            <input type="text" id="labor_nombre" class="form-control" wire:model="laborNombre" readonly>
-                            <!-- Campo oculto para enviar el ID real -->
-                            <input type="hidden" name="labore_id" value="{{ $laborSeleccionada }}">
-                            @error('labore_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                            </div>
-
-                            <!-- Observación -->
-                            <div class="mb-3">
-                                <label for="observacion" class="form-label">Observación</label>
-                                <textarea id="observacion" name="observacion"
-                                    class="form-control @error('observacion') is-invalid @enderror">{{ old('observacion', $reporte->observacion ?? '') }}</textarea>
-                                @error('observacion')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="card mb-4">
-                  <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title mb-0">Detalle del registro diario</h3>
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalRegistro">
-                        <i class="bi bi-plus"></i> Añadir registro
-                    </button>
-                </div>
-                  <!-- /.card-header -->
-                  <div class="card-body p-0">
-                    <table class="table table-striped" role="table">
-                      <thead>
-                        <tr>
-                          <th style="width: 10px" scope="col">#</th>
-                          <th scope="col">Lote</th>
-                          <th scope="col">Acopio</th>
-                          <th scope="col">Lineas</th>
-                          <th scope="col">Cantidad</th>
-                          <th style="width: 40px" scope="col">Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @forelse ($detalles as $detalle)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $lotes->find($detalle['lote_id'])->nombre ?? 'N/A' }}</td>
-                                <td>{{ $acopios->find($detalle['acopio_id'])->nombre ?? 'N/A' }}</td>
-                                <td>{{ $detalle['linea'] }}</td>
-                                <td>{{ $detalle['cantidad'] }}</td>
-                                <td>
-                                    <button type="button" class="btn btn-danger btn-sm" wire:click="eliminarDetalle({{ $loop->index }})">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </button>
-                                </td>
-                            </tr>
-                            @empty
-                                    <!-- Este bloque se activa automáticamente si no hay detalle en la base de datos -->
-                                    <tr>
-                                        <td colspan="8" class="text-center py-4 text-muted">
-                                            <i class="bi bi-info-circle me-1"></i> No hay detalle asignado actualmente
-                                        </td>
-                                    </tr>
-                            
-                        @endforelse
-                      </tbody>
-                    </table>
-                  </div>
-                  <!-- /.card-body -->
-                  <!-- Modal -->
-                <div wire:ignore.self class="modal fade" id="modalRegistro" tabindex="-1" aria-labelledby="modalRegistroLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalRegistroLabel">Añadir registro</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                        <label for="lote_id" class="form-label">Lote</label>
-                        <select id="lote_id" class="form-select" wire:model="loteSeleccionado">
-                            <option value="">Seleccione...</option>
-                            @foreach ($lotes as $lote)
-                                <option value="{{ $lote->id }}">{{ $lote->nombre }}</option>
-                            @endforeach
-                        </select>
-                        </div>
-                        <div class="mb-3">
-                        <label for="acopio_id" class="form-label">Acopios</label>
-                        <select id="acopio_id" class="form-select" wire:model="acopioSeleccionado">
-                            <option value="">Seleccione...</option>
-                            @foreach ($acopios as $acopio)
-                                <option value="{{ $acopio->id }}">{{ $acopio->nombre }}</option>
-                            @endforeach
-                        </select>
-                        </div>
-                        <div class="mb-3">
-                        <label for="lineasSeleccionadas" class="form-label">Lineas</label>
-                        <input type="text" id="lineasSeleccionadas" class="form-control" wire:model="lineasSeleccionadas">
-                        </div>
-                        <div class="mb-3">
-                        <label for="cantidadSeleccionada" class="form-label">Cantidad</label>
-                        <input type="number" id="cantidadSeleccionada" class="form-control" wire:model="cantidadSeleccionada">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary" wire:click="agregarDetalle" data-bs-dismiss="modal">
-                        Añadir
-                        </button>
-                    </div>
-                    </div>
-                </div>
-                </div>
+        {{-- Información general --}}
+        <div class="mb-6">
+            <flux:heading size="lg">Información del reporte</flux:heading>
+            <flux:text size="sm" class="mt-1">
+                Registra la información general de la jornada de trabajo.
+            </flux:text>
         </div>
 
-                            <a href="{{ route('reportes-diarios.index') }}" class="btn btn-warning" type="button">
-                                <i class="bi bi-arrow-left-short"></i> Volver
-                            </a>
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
 
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-save"></i> Guardar
-                            </button>
-                        </form>
+            {{-- Fecha --}}
+            <flux:field>
+                <flux:label for="fecha">Fecha</flux:label>
+
+                <flux:input
+                    type="date"
+                    id="fecha"
+                    name="fecha"
+                    wire:model="fecha"
+                    value="{{ old('fecha', $reporte->fecha ?? '') }}"
+                    onchange="Livewire.dispatch('fechaActualizada', { fecha: this.value })"
+                />
+
+                <flux:error name="fecha" />
+            </flux:field>
+
+            {{-- Cuadrilla --}}
+            <flux:field>
+                <flux:label for="cuadrilla_id">Cuadrilla</flux:label>
+
+                <flux:select
+                    id="cuadrilla_id"
+                    name="cuadrilla_id"
+                    wire:model.live="cuadrillaSeleccionada"
+                >
+                    <option value="">Seleccione...</option>
+
+                    @foreach ($cuadrillas as $cuadrilla)
+                        <option value="{{ $cuadrilla->id }}">
+                            {{ $cuadrilla->nombre }}
+
+                            @if($cuadrilla->trabajadores->isNotEmpty())
+                                - [{{ $cuadrilla->trabajadores->pluck('nombres')->join(', ') }}]
+                            @else
+                                - [Sin trabajadores]
+                            @endif
+                        </option>
+                    @endforeach
+                </flux:select>
+
+                <flux:error name="cuadrilla_id" />
+            </flux:field>
+
+            {{-- Labor --}}
+            <flux:field>
+                <flux:label for="labor_nombre">Labor</flux:label>
+
+                <flux:input
+                    type="text"
+                    id="labor_nombre"
+                    wire:model="laborNombre"
+                    readonly
+                />
+
+                {{-- Campo oculto para enviar el ID real --}}
+                <input type="hidden" name="labore_id" value="{{ $laborSeleccionada }}">
+
+                <flux:error name="labore_id" />
+            </flux:field>
+
+        </div>
+
+        {{-- Observación --}}
+        <div class="mt-5">
+            <flux:field>
+                <flux:label for="observacion">Observación</flux:label>
+
+                <flux:textarea
+                    id="observacion"
+                    name="observacion"
+                    rows="3"
+                >{{ old('observacion', $reporte->observacion ?? '') }}</flux:textarea>
+
+                <flux:error name="observacion" />
+            </flux:field>
+        </div>
+
+        {{-- Detalle del registro diario --}}
+        <div class="mt-8 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700">
+
+            {{-- Encabezado de la tabla --}}
+            <div class="flex flex-col gap-3 border-b border-zinc-200 bg-zinc-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-700 dark:bg-zinc-800/60">
+
+                <div>
+                    <flux:heading size="lg">
+                        Detalle del registro diario
+                    </flux:heading>
+
+                    <flux:text size="sm" class="mt-1">
+                        Administra los lotes, acopios y cantidades registrados.
+                    </flux:text>
+                </div>
+
+                <flux:button
+                    type="button"
+                    variant="primary"
+                    class="btn-create"
+                    icon="plus"
+                    x-on:click="$flux.modal('modal-registro').show()"
+                >
+                    Añadir registro
+                </flux:button>
+
+            </div>
+
+            {{-- Tabla --}}
+            <div class="overflow-x-auto">
+
+                <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
+
+                    <thead class="bg-zinc-50 dark:bg-zinc-800/40">
+                        <tr>
+                            <th class="w-16 px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                                #
+                            </th>
+
+                            <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                                Lote
+                            </th>
+
+                            <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                                Acopio
+                            </th>
+
+                            <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                                Líneas
+                            </th>
+
+                            <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                                Cantidad
+                            </th>
+
+                            <th class="w-28 px-5 py-3 text-center text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
+
+                        @forelse ($detalles as $detalle)
+
+                            <tr
+                                wire:key="detalle-{{ $loop->index }}"
+                                class="transition-colors hover:bg-violet-50/50 dark:hover:bg-zinc-800/50"
+                            >
+
+                                <td class="px-5 py-3.5 text-sm text-zinc-500 dark:text-zinc-400">
+                                    {{ $loop->iteration }}
+                                </td>
+
+                                <td class="px-5 py-3.5 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                                    {{ $lotes->find($detalle['lote_id'])->nombre ?? 'N/A' }}
+                                </td>
+
+                                <td class="px-5 py-3.5 text-sm text-zinc-600 dark:text-zinc-300">
+                                    {{ $acopios->find($detalle['acopio_id'])->nombre ?? 'N/A' }}
+                                </td>
+
+                                <td class="px-5 py-3.5 text-sm text-zinc-600 dark:text-zinc-300">
+                                    {{ $detalle['linea'] }}
+                                </td>
+
+                                <td class="px-5 py-3.5 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                                    {{ $detalle['cantidad'] }}
+                                </td>
+
+                                <td class="px-5 py-3.5 text-center">
+                                    <flux:button
+                                        type="button"
+                                        variant="ghost"
+                                        color="danger"
+                                        size="sm"
+                                        icon="trash"
+                                        title="Eliminar detalle"
+                                        wire:click="eliminarDetalle({{ $loop->index }})"
+                                    />
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+                                <td colspan="6" class="px-5 py-10 text-center">
+
+                                    <div class="flex flex-col items-center gap-2">
+
+                                        <div class="flex size-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
+                                            <flux:icon.document-arrow-up class="size-6 text-zinc-400" />
+                                        </div>
+
+                                        <flux:heading size="sm">
+                                            No hay detalles registrados
+                                        </flux:heading>
+
+                                        <flux:text size="sm">
+                                            Añade un registro para comenzar.
+                                        </flux:text>
+
+                                    </div>
+
+                                </td>
+                            </tr>
+
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+
+        {{-- Modal para añadir registro --}}
+        <flux:modal name="modal-registro" class="md:w-120">
+
+            <div class="space-y-6">
+
+                <div>
+                    <flux:heading size="lg">
+                        Añadir registro
+                    </flux:heading>
+
+                    <flux:text size="sm" class="mt-1">
+                        Introduce los datos del detalle diario.
+                    </flux:text>
+                </div>
+
+                {{-- Lote --}}
+                <flux:field>
+                    <flux:label for="lote_id">Lote</flux:label>
+
+                    <flux:select
+                        id="lote_id"
+                        wire:model="loteSeleccionado"
+                    >
+                        <option value="">Seleccione...</option>
+
+                        @foreach ($lotes as $lote)
+                            <option value="{{ $lote->id }}">
+                                {{ $lote->nombre }}
+                            </option>
+                        @endforeach
+
+                    </flux:select>
+                </flux:field>
+
+                {{-- Acopio --}}
+                <flux:field>
+                    <flux:label for="acopio_id">Acopio</flux:label>
+
+                    <flux:select
+                        id="acopio_id"
+                        wire:model="acopioSeleccionado"
+                    >
+                        <option value="">Seleccione...</option>
+
+                        @foreach ($acopios as $acopio)
+                            <option value="{{ $acopio->id }}">
+                                {{ $acopio->nombre }}
+                            </option>
+                        @endforeach
+
+                    </flux:select>
+                </flux:field>
+
+                {{-- Líneas --}}
+                <flux:field>
+                    <flux:label for="lineasSeleccionadas">Líneas</flux:label>
+
+                    <flux:input
+                        type="text"
+                        id="lineasSeleccionadas"
+                        wire:model="lineasSeleccionadas"
+                    />
+                </flux:field>
+
+                {{-- Cantidad --}}
+                <flux:field>
+                    <flux:label for="cantidadSeleccionada">Cantidad</flux:label>
+
+                    <flux:input
+                        type="number"
+                        id="cantidadSeleccionada"
+                        wire:model="cantidadSeleccionada"
+                    />
+                </flux:field>
+
+                {{-- Acciones --}}
+                <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+
+                    <flux:modal.close>
+                        <flux:button variant="ghost">
+                            Cancelar
+                        </flux:button>
+                    </flux:modal.close>
+
+                    <flux:button
+                        type="button"
+                        variant="primary"
+                        class="btn-create"
+                        icon="plus"
+                        wire:click="agregarDetalle"
+                        wire:loading.attr="disabled"
+                    >
+                        <span wire:loading.remove wire:target="agregarDetalle">
+                            Añadir
+                        </span>
+
+                        <span wire:loading wire:target="agregarDetalle">
+                            Añadiendo...
+                        </span>
+                    </flux:button>
+
+                </div>
+
+            </div>
+
+        </flux:modal>
+
+        {{-- Botones del formulario --}}
+        <div class="mt-8 flex flex-col-reverse gap-3 border-t border-zinc-200 pt-5 sm:flex-row sm:justify-end dark:border-zinc-700">
+
+            <flux:button
+                href="{{ route('reportes-diarios.index') }}"
+                variant="ghost"
+                icon="arrow-left"
+            >
+                Volver
+            </flux:button>
+
+            <flux:button
+                type="submit"
+                variant="primary"
+                class="btn-create"
+                icon="plus"
+                wire:loading.attr="disabled"
+                wire:target="save"
+            >
+                <span wire:loading.remove wire:target="save">
+                    Guardar
+                </span>
+
+                <span wire:loading wire:target="save">
+                    Guardando...
+                </span>
+            </flux:button>
+
+        </div>
+
+    </form>
 
 </div>

@@ -114,4 +114,8 @@ class Team extends Model
     {
         return 'slug';
     }
+    public function empresa(): HasMany
+    {
+        return $this->hasMany(Empresa::class);
+    }
 }
