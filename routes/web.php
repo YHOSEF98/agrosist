@@ -37,10 +37,10 @@ Route::prefix('{current_team}')
         Route::resource('trabajadores', TrabajadorController::class)->except(['show'])->parameters(['trabajadores' => 'trabajador',]);
         Route::resource('cuadrillas', CuadrillaController::class)->except(['show']);
         Route::resource('reportes-diarios', ReportesDiarioController::class)->except(['show','update']);
-        // Route::resource('pluviometros', PluviometroController::class);
-        // Route::resource('pluviometria', PluviometriaController::class)->except(['show']);
-        // Route::resource('proveedores', ProvedoreController::class)->except(['show']);
-        // Route::resource('conductores', ConductoreController::class)->except(['show']);
+        Route::resource('pluviometros', PluviometroController::class);
+        Route::resource('pluviometria', PluviometriaController::class)->except(['show'])->parameters(['pluviometria' => 'pluviometria',]);
+        Route::resource('proveedores', ProvedoreController::class)->except(['show']);
+        Route::resource('conductores', ConductoreController::class)->except(['show']);
     });
 
 Route::middleware(['auth'])->group(function () {

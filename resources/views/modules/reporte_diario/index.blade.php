@@ -54,8 +54,8 @@
                                         <flux:button size="xs" class="text-red-600 hover:text-red-800" icon="archive-box-x-mark"
                                             variant="outline" color="red" title="Eliminar"
                                             x-on:click="
-                                                reporte_diario = {
-                                                    nombre: @js($reporteDiario->nombre),
+                                                reportes_diario = {
+                                                    nombre: @js($reporteDiario->cuadrilla->nombre),
                                                     url: @js(route('reportes-diarios.destroy', [
                                                         'current_team' => request()->route('current_team'),
                                                         'reportes_diario' => $reporteDiario->id,])),};

@@ -15,10 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('razon_social');
             $table->string('nombre_comercial')->nullable();
-            $table->string('tipo_contribuyente');
-            $table->string('tipo_documento');
-            $table->string('numero_documento')->unique();
-            $table->string('digito_verificacion')->nullable();
+            $table->foreignId('tipo_documento_id')->constrained('tipos_documentos')->onDelete('cascade');
+            $table->string('numero_documento', 20)->unique();
+            $table->string('digito_verificacion', 1)->nullable();
             $table->string('direccion')->nullable();
             $table->string('telefono', 20)->nullable();
             $table->string('email')->nullable();

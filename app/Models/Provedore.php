@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Enums\TipoDocumento;
 
 class Provedore extends Model
 {
@@ -11,16 +10,14 @@ class Provedore extends Model
 
     protected $casts = [
         'es_cliente' => 'boolean',
-        'tipo_documento' => TipoDocumento::class,
     ];
 
      protected $fillable = [
         'razon_social',
         'nombre_comercial',
-        'tipo_contribuyente',
-        'tipo_documento',
+        'tipo_documento_id',
         'numero_documento',
-        'digito_verificador',
+        'digito_verificacion',
         'direccion',
         'telefono',
         'email',

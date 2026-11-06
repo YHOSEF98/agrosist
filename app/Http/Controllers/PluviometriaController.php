@@ -22,22 +22,23 @@ class PluviometriaController extends Controller
      */
     public function create()
     {
+        $pluviometria = null;
         $pluviometros = Pluviometro::all();
-        return view('modules.pluviometria.create', compact('pluviometros'));
+        return view('modules.pluviometria.create', compact('pluviometros', 'pluviometria'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, string $current_team)
     {
-        $request->validate([
+        $validated = $request->validate([
             'pluviometro_id' => 'required|exists:pluviometros,id',
             'fecha' => 'required|date',
             'cantidad' => 'required|numeric',
         ]);
 
-        Pluviometria::create($request->all());
+        Pluviometria::create($validated);
 
         return redirect()->route('pluviometria.index')
             ->with('success', 'Registro de pluviometría creado exitosamente.');
@@ -54,9 +55,8 @@ class PluviometriaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $current_team, Pluviometria $pluviometria)
     {
-        $pluviometria = Pluviometria::findOrFail($id);
         $pluviometros = Pluviometro::all();
         return view('modules.pluviometria.create', compact('pluviometria', 'pluviometros'));
     }
@@ -64,17 +64,15 @@ class PluviometriaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $current_team, Pluviometria $pluviometria)
     {
-        $pluviometria = Pluviometria::findOrFail($id);
-
-        $request->validate([
+        $validated = $request->validate([
             'pluviometro_id' => 'required|exists:pluviometros,id',
             'fecha' => 'required|date',
             'cantidad' => 'required|numeric',
         ]);
 
-        $pluviometria->update($request->all());
+        $pluviometria->update($validated);
 
         return redirect()->route('pluviometria.index')
             ->with('success', 'Registro de pluviometría actualizado exitosamente.');
@@ -83,9 +81,8 @@ class PluviometriaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $current_team, Pluviometria $pluviometria)
     {
-        $pluviometria = Pluviometria::findOrFail($id);
         $pluviometria->delete();
 
         return redirect()->route('pluviometria.index')

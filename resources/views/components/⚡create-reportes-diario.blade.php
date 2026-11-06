@@ -120,7 +120,7 @@ new class extends Component
         'fecha' => 'required|date',
         'cuadrillaSeleccionada' => 'required|exists:cuadrillas,id',
         'laborSeleccionada' => 'required|exists:labores,id',
-        'reporte.observacion' => 'nullable|string|max:255',
+        'observacion' => 'nullable|string|max:255',
 
         // Validaciones para los detalles
         'detalles.*.lote_id' => 'required|exists:lotes,id',
@@ -140,7 +140,7 @@ new class extends Component
             'fecha' => $this->fecha,
             'cuadrilla_id' => $this->cuadrillaSeleccionada,
             'labore_id' => $this->laborSeleccionada,
-            'observacion' => $this->reporte->observacion ?? null,
+            'observacion' => $this->observacion ?? null,
         ]);
 
         // Eliminar detalles anteriores y volver a guardar
@@ -172,7 +172,7 @@ new class extends Component
             'fecha' => $this->fecha,
             'cuadrilla_id' => $this->cuadrillaSeleccionada,
             'labore_id' => $this->laborSeleccionada,
-            'observacion' => $this->reporte['observacion'] ?? null,
+            'observacion' => $this->observacion ?? null,
         ]);
 
         foreach ($this->detalles as $detalle) {
@@ -289,6 +289,7 @@ new class extends Component
                 <flux:textarea
                     id="observacion"
                     name="observacion"
+                    wire:model="observacion"
                     rows="3"
                 >{{ old('observacion', $reporte->observacion ?? '') }}</flux:textarea>
 

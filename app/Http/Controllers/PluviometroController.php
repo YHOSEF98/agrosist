@@ -22,23 +22,24 @@ class PluviometroController extends Controller
      */
     public function create()
     {
+        $pluviometro = null;
         $fincas = Finca::all();
-        return view('modules.pluviometro.create', compact('fincas'));
+        return view('modules.pluviometro.create', compact('pluviometro', 'fincas'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, string $current_team)
     {
-        $request->validate([
+        $validated = $request->validate([
             'finca_id' => 'required|exists:fincas,id',
             'nombre' => 'required|string|max:255',
             'ubicacion' => 'nullable|string|max:255',
             'observaciones' => 'nullable|string|max:1000',
         ]);
 
-        Pluviometro::create($request->all());
+        Pluviometro::create($validated);
 
         return redirect()->route('pluviometros.index')
             ->with('success', 'Pluviometro creado exitosamente.');
@@ -47,18 +48,16 @@ class PluviometroController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $current_team, Pluviometro $pluviometro)
     {
-        $pluviometro = Pluviometro::findOrFail($id);
         return view('modules.pluviometro.show', compact('pluviometro'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $current_team, Pluviometro $pluviometro)
     {
-        $pluviometro = Pluviometro::findOrFail($id);
         $fincas = Finca::all();
         return view('modules.pluviometro.create', compact('pluviometro', 'fincas'));
     }
@@ -66,16 +65,16 @@ class PluviometroController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Pluviometro $pluviometro)
+    public function update(Request $request, string $current_team, Pluviometro $pluviometro)
     {
-        $request->validate([
+        $validated = $request->validate([
             'finca_id' => 'required|exists:fincas,id',
             'nombre' => 'required|string|max:255',
             'ubicacion' => 'nullable|string|max:255',
             'observaciones' => 'nullable|string|max:1000',
         ]);
 
-        $pluviometro->update($request->all());
+        $pluviometro->update($validated);
 
         return redirect()->route('pluviometros.index')
             ->with('success', 'Pluviometro actualizado exitosamente.'); 
@@ -84,9 +83,8 @@ class PluviometroController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $current_team, Pluviometro $pluviometro)
     {
-        $pluviometro = Pluviometro::findOrFail($id);
         $pluviometro->delete();
 
         return redirect()->route('pluviometros.index')

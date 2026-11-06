@@ -21,44 +21,50 @@ class ConductoreController extends Controller
      */
     public function create()
     {
+        $conductore = null;
         $proveedores = \App\Models\Provedore::all();
-        return view('modules.conductores.create', compact('proveedores'));
+        $tiposDocumentos = \App\Models\TiposDocumento::all();
+        return view('modules.conductores.create', compact('conductore', 'proveedores', 'tiposDocumentos'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, string $current_team)
     {
-        // 1. Validar los datos que vienen del formulario
-        $request->validate([
-            'provedore_id' => 'required|exists:provedores,id',
-            'tipo_documento' => 'required|string|max:30',
-            'documento' => 'required|integer',
-            'nombres' => 'required|string|max:255',
-            'apellidos' => 'required|string|max:255',
-            'placa' => 'nullable|string|max:20',
-        ], [
-            // Mensajes personalizados en español
-            'nombres.required' => 'El nombre del conductor es obligatorio.',
-            'apellidos.required' => 'El apellido del conductor es obligatorio.',
-            'documento.required' => 'El número de documento es obligatorio.',
-            'provedore_id.required' => 'Debe seleccionar un proveedor.',
-            'provedore_id.exists' => 'El proveedor seleccionado no es válido.',
-        ]);
+        try {
+            // 1. Validar los datos que vienen del formulario
+            $validated =$request->validate([
+                'provedore_id' => 'required|exists:provedores,id',
+                'tipo_documento_id' => 'required|exists:tipos_documentos,id',
+                'numero_documento' => 'required|integer',
+                'nombres' => 'required|string|max:255',
+                'apellidos' => 'required|string|max:255',
+                'telefono' => 'nullable|string|max:20',
+                'placa' => 'nullable|string|max:20',
+            ], [
+                // Mensajes personalizados en español
+                'nombres.required' => 'El nombre del conductor es obligatorio.',
+                'apellidos.required' => 'El apellido del conductor es obligatorio.',
+                'numero_documento.required' => 'El número de documento es obligatorio.',
+                'tipo_documento_id.required' => 'Debe seleccionar un tipo de documento.',
+                'tipo_documento_id.exists' => 'El tipo de documento seleccionado no es válido.',
+                'provedore_id.required' => 'Debe seleccionar un proveedor.',
+                'provedore_id.exists' => 'El proveedor seleccionado no es válido.',
+            ]);
 
-        // 2. Crear el registro en la base de datos
-        Conductore::create([
-            'provedore_id' => $request->provedore_id,
-            'tipo_documento' => $request->tipo_documento,
-            'documento' => $request->documento,
-            'nombres' => $request->nombres,
-            'apellidos' => $request->apellidos,
-            'placa' => $request->placa,
-        ]);
+            // 2. Crear el registro en la base de datos
+            Conductore::create($validated);
 
-        // 3. Redirigir a la lista de conductores con un mensaje de éxito
-        return redirect()->route('conductores.index')->with('success', 'Conductor creado exitosamente.');
+            // 3. Redirigir a la lista de conductores con un mensaje de éxito
+            return redirect()->route('conductores.index')->with('success', 'Conductor creado exitosamente.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('conductores.index', [
+                    'current_team' => $current_team
+                ])
+                ->with('warning', $e->getMessage());
+        }
     }
 
     /**
@@ -72,46 +78,40 @@ class ConductoreController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $current_team, Conductore $conductore)
     {
-        $conductor = Conductore::findOrFail($id);
         $proveedores = \App\Models\Provedore::all();
-        return view('modules.conductores.create', compact('conductor', 'proveedores'));
+        $tiposDocumentos = \App\Models\TiposDocumento::all();
+        return view('modules.conductores.create', compact('conductore', 'proveedores', 'tiposDocumentos'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $current_team, Conductore $conductore)
     {
-        $conductore = Conductore::findOrFail($id);
-
         // 1. Validar los datos que vienen del formulario
-        $request->validate([
+        $validated = $request->validate([
             'provedore_id' => 'required|exists:provedores,id',
-            'tipo_documento' => 'required|string|max:30',
-            'documento' => 'required|integer',
+            'tipo_documento_id' => 'required|exists:tipos_documentos,id',
+            'numero_documento' => 'required|integer',
             'nombres' => 'required|string|max:255',
             'apellidos' => 'required|string|max:255',
             'placa' => 'nullable|string|max:20',
+            'telefono' => 'nullable|string|max:20',
         ], [
             // Mensajes personalizados en español
             'nombres.required' => 'El nombre del conductor es obligatorio.',
             'apellidos.required' => 'El apellido del conductor es obligatorio.',
-            'documento.required' => 'El número de documento es obligatorio.',
+            'numero_documento.required' => 'El número de documento es obligatorio.',
+            'tipo_documento_id.required' => 'Debe seleccionar un tipo de documento.',
+            'tipo_documento_id.exists' => 'El tipo de documento seleccionado no es válido.',
             'provedore_id.required' => 'Debe seleccionar un proveedor.',
             'provedore_id.exists' => 'El proveedor seleccionado no es válido.',
         ]);
 
         // 2. Actualizar el registro en la base de datos
-        $conductore->update([
-            'provedore_id' => $request->provedore_id,
-            'tipo_documento' => $request->tipo_documento,
-            'documento' => $request->documento,
-            'nombres' => $request->nombres,
-            'apellidos' => $request->apellidos,
-            'placa' => $request->placa,
-        ]);
+        $conductore->update($validated);
 
         // 3. Redirigir a la lista de conductores con un mensaje de éxito
         return redirect()->route('conductores.index')->with('success', 'Conductor actualizado exitosamente.');
@@ -120,10 +120,9 @@ class ConductoreController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $current_team, Conductore $conductore)
     {
-        $conductor = Conductore::findOrFail($id);
-        $conductor->delete();
+        $conductore->delete();
 
         return redirect()->route('conductores.index')->with('success', 'Conductor eliminado exitosamente.');
     }

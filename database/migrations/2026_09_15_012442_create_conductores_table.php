@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('conductores', function (Blueprint $table) {
             $table->id();
             $table->foreignId('provedore_id')->constrained('provedores')->onDelete('cascade');
-            $table->string('tipo_documento')->default('CC');
-            $table->integer('documento');
+            $table->foreignId('tipo_documento_id')->constrained('tipos_documentos')->onDelete('cascade');
+            $table->integer('numero_documento');
             $table->string('nombres');
             $table->string('apellidos');
-            $table->string('placa');
+            $table->string('placa', 8);
+            $table->string('telefono', 20)->nullable();
             $table->timestamps();
         });
     }

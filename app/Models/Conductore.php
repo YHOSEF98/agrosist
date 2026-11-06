@@ -15,11 +15,12 @@ class Conductore extends Model
 
     protected $fillable = [
         'provedore_id',
-        'tipo_documento',
-        'documento',
+        'tipo_documento_id',
+        'numero_documento',
         'nombres',
         'apellidos',
         'placa',
+        'telefono',
     ];
 
     public function proveedor()

@@ -28,7 +28,9 @@
                         <flux:sidebar.item icon="user-circle" href="{{ route('cuadrillas.index') }}" :current="request()->routeIs('cuadrillas.index')" wire:navigate>
                             {{ __('Equipos de trabajo') }}
                         </flux:sidebar.item>
-                        <flux:sidebar.item icon="calendar-days" href="#">Pluviometria</flux:sidebar.item>
+                        <flux:sidebar.item icon="calendar-days" href="{{ route('pluviometria.index') }}" :current="request()->routeIs('pluviometria.index')" wire:navigate>
+                            {{ __('Pluviometria') }}
+                        </flux:sidebar.item>
                 </flux:sidebar.group">
 
                 <flux:sidebar.group expandable :expanded="false" icon="user-group" heading="Usuarios" class="grid">
@@ -36,8 +38,12 @@
                         <flux:sidebar.item icon="identification" href="{{ route('trabajadores.index') }}" :current="request()->routeIs('trabajadores.index')" wire:navigate>
                             {{ __('Trabajadores') }}
                         </flux:sidebar.item>
-                        <flux:sidebar.item icon="user-plus" href="#">Proveedores</flux:sidebar.item>
-                        <flux:sidebar.item icon="truck" href="#">Conductores</flux:sidebar.item>
+                        <flux:sidebar.item icon="user-plus" href="{{ route('proveedores.index') }}" :current="request()->routeIs('proveedores.index')" wire:navigate>
+                            {{ __('Proveedores') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="truck" href="{{ route('conductores.index') }}" :current="request()->routeIs('conductores.index')" wire:navigate>
+                            {{ __('Conductores') }}
+                        </flux:sidebar.item>
                 </flux:sidebar.group">
                 
                 <flux:sidebar.group :heading="__('Empresariales')" class="grid">
