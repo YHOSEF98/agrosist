@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('direccion')->nullable();
             $table->string('telefono', 20)->nullable();
             $table->string('email')->nullable();
+            $table->integer('no_remision')->nullable();
             $table->timestamps();
         });
     }

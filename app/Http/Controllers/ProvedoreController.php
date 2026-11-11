@@ -25,7 +25,7 @@ class ProvedoreController extends Controller
         $proveedore = null;
         $tiposDocumentos = TiposDocumento::all(); // Obtener todos los tipos de documentos
         $proveedor = null; // Inicializar la variable $proveedor como null
-        return view('modules.proveedores.create', compact('proveedor', 'tiposDocumentos'));
+        return view('modules.proveedores.create', compact('proveedore', 'tiposDocumentos'));
     }
 
     /**

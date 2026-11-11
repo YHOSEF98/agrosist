@@ -18,6 +18,7 @@ class Empresa extends Model
             'direccion',
             'telefono',
             'email',
+            'no_remision',
     ];
     public function tipoDocumento()
     {

@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
-Route::get('/casa', [EmpresaController::class, 'index'])->name('casa');
 Route::prefix('{current_team}')
     ->middleware(['auth', 'verified', EnsureTeamMembership::class])
     ->group(function () {
@@ -41,6 +40,8 @@ Route::prefix('{current_team}')
         Route::resource('pluviometria', PluviometriaController::class)->except(['show'])->parameters(['pluviometria' => 'pluviometria',]);
         Route::resource('proveedores', ProvedoreController::class)->except(['show']);
         Route::resource('conductores', ConductoreController::class)->except(['show']);
+        Route::resource('alce-fruto', \App\Http\Controllers\RemisionFrutoController::class)->except(['show']);
+        Route::resource('viajes-fruto', \App\Http\Controllers\ViajeFrutoController::class)->except(['show']);
     });
 
 Route::middleware(['auth'])->group(function () {

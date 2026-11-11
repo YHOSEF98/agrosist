@@ -12,7 +12,8 @@ class ViajeFrutoController extends Controller
      */
     public function index()
     {
-        //
+        $viajes = ViajeFruto::all();
+        return view('modules.viajes_fruto.index', compact('viajes'));
     }
 
     /**
@@ -20,7 +21,8 @@ class ViajeFrutoController extends Controller
      */
     public function create()
     {
-        //
+        $viaje = null;
+        return view('modules.viajes_fruto.create', compact('viaje'));
     }
 
     /**

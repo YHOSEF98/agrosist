@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('remision_frutos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('empresa_id')->constrained('empresas')->onDelete('cascade');
+            $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
             $table->date('fecha');
             $table->integer('remision')->unique();
             $table->foreignId('finca_id')->constrained('fincas')->onDelete('cascade');

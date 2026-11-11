@@ -23,6 +23,7 @@ class EmpresaSeeder extends Seeder
             'direccion' => 'Calle 2 #54-54, La gloria',
             'telefono' => '3103250719',
             'email' => 'palmerasdelnispero@gmail.com',
+            'no_remision' => 100,
         ]);
 
         Empresa::firstOrCreate([
@@ -35,6 +36,7 @@ class EmpresaSeeder extends Seeder
             'direccion' => 'Calle 1 #1-1, Ciudad',
             'telefono' => '3103250719',
             'email' => 'albertomeneses@gmail.com',
+            'no_remision' => 100,
         ]);
     }
 }
