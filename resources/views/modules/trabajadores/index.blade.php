@@ -61,13 +61,15 @@
                                 <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $trabajador->fecha_ingreso }}</td>
                                 <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $trabajador->email }}</td>
                                 <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $trabajador->cargo->nombre }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100"><span
-                                        class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                                        {{ $trabajador->estatus == 'activo'
+                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">
+                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+                                        {{ $trabajador->estatus
                                             ? 'bg-green-100 text-green-700'
                                             : 'bg-red-100 text-red-700' }}">
-                                        {{ $trabajador->estatus == 'activo' ? 'Activo' : 'Inactivo' }}
-                                    </span></td>
+
+                                        {{ $trabajador->estatus ? 'Activo' : 'Inactivo' }}
+                                    </span>
+                                </td>
                                 <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">
                                     <div class="inline-flex items-center gap-2">
 

@@ -55,7 +55,7 @@ class TrabajadorController extends Controller
         'cargo_id' => 'required|exists:cargos,id',
         'salario' => 'required|numeric|min:0',
         'aux_transporte' => 'nullable|numeric|min:0',
-        'estatus' => 'required|string|in:Activo,Inactivo',
+        'estatus' => 'required|boolean',
         'team_id' => 'required|exists:teams,id',
     ]);
 
@@ -105,6 +105,7 @@ class TrabajadorController extends Controller
         'cargo_id' => 'required|exists:cargos,id',
         'salario' => 'required|numeric|min:0',
         'aux_transporte' => 'nullable|numeric|min:0',
+        'estatus' => 'required|boolean',
         'team_id' => 'required|exists:teams,id',
     ]);
         $trabajador->update($validated);

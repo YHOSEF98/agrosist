@@ -23,11 +23,11 @@ class Invfruta extends Model
 
     public function lote()
     {
-        return $this->belongsTo(Lote::class);
+        return $this->belongsTo(Lote::class,'lote_id');
     }
 
     public function acopio()
     {
-        return $this->belongsTo(Acopio::class);
+        return $this->belongsTo(Acopio::class, 'acopio_id');
     }
 }

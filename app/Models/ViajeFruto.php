@@ -19,6 +19,11 @@ class ViajeFruto extends Model
     ];
 
     public function remisionfruto(){
-        return $this->belongsTo(RemisionFruto::class);
+        return $this->belongsTo(RemisionFruto::class, 'remision_fruto_id');
+    }
+
+    public function detalles()
+    {
+        return $this->hasMany(DetalleViaje::class,'viaje_fruto_id');
     }
 }

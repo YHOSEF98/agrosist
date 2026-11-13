@@ -139,14 +139,14 @@
                         :value="old('aux_transporte', $trabajador?->aux_transporte)" autofocus/>
 
                         <div>
-                            <input type="hidden" name="estatus" value="Inactivo">
+                            <input type="hidden" name="estatus" value="0">
                             <flux:field>
-                                <flux:label>Estado</flux:label>
+                                <flux:label>Estatus</flux:label>
 
                                 <flux:switch
                                     name="estatus"
-                                    value="Activo"
-                                    :checked="old('estatus', $trabajador?->estatus) == 'Activo'"
+                                    value="1"
+                                    :checked="(bool) old('estatus', $trabajador?->estatus ?? true)"
                                 />
 
                                 <flux:error name="estatus" />

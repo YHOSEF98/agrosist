@@ -44,15 +44,16 @@ class ViajeFrutoController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ViajeFruto $viajeFruto)
+    public function edit(string $current_team, ViajeFruto $viajes_fruto)
     {
-        //
+        $viaje=$viajes_fruto;
+        return view('modules.viajes_fruto.create', compact('viaje'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ViajeFruto $viajeFruto)
+    public function update(Request $request,string $current_team, ViajeFruto $viajeFruto)
     {
         //
     }
@@ -60,8 +61,9 @@ class ViajeFrutoController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ViajeFruto $viajeFruto)
+    public function destroy(string $current_team, ViajeFruto $viajes_fruto)
     {
-        //
+        $viajes_fruto->delete();
+        return redirect()->route('viajes-fruto.index')->with('success', 'Viaje eliminado correctamente.');
     }
 }

@@ -3,15 +3,83 @@
 use Livewire\Component;
 use App\Models\RemisionFruto;
 use App\Models\DetViajeFruto;
+use App\Models\ViajeFruto;
+use App\Models\DetalleViaje;
+use Illuminate\Support\Facades\DB;
 use Flux\Flux;
 
 new class extends Component
 {
     public $detalles=[], $remisiones,$fecha, $ticket, $ticket_c, $peso_bruto,$tara,$peso_neto_viaje=0, $calidad, $peso_final;
     public $remisionSeleccionada, $subtotal_detalles=0, $peso_restante;
+    public ?ViajeFruto $viaje = null;
 
-    public function mount(){
-        $this->remisiones = RemisionFruto::whereDoesntHave('viajeFruto')->get();
+    protected function rules(){
+        return [
+            'fecha'=> 'required|date',
+            'ticket'=> 'required|integer|min:0',
+            'ticket_c'=> 'required|integer|min:0',
+            'remisionSeleccionada'=> 'required|exists:remision_frutos,id',
+            'peso_bruto'=> 'required|integer|min:0',
+            'tara'=> 'required|integer|min:0',
+            'peso_neto_viaje'=> 'required|integer|min:0',
+            'calidad'=> 'required|integer|min:0',
+
+            'detalles' => 'required|array|min:1',
+            'detalles.*.id' => 'required|exists:det_viaje_frutos,id',
+            'detalles.*.promedio' => 'required|numeric|min:0',
+            'detalles.*.peso_neto' => 'required|numeric|min:0',
+            ];
+    }
+
+    public function mount(?ViajeFruto $viaje = null)
+    {
+        $this->viaje = $viaje;
+
+        if ($this->viaje && $this->viaje->exists) {
+
+            $this->viaje->load([
+                'remisionfruto',
+                'detalles.det_remision.invfruta.lote',
+            ]);
+
+            $this->fecha = $this->viaje->fecha;
+            $this->remisionSeleccionada = $this->viaje->remision_fruto_id;
+
+            // Solo mostrar la remisión actual
+            $this->remisiones = collect([
+                $this->viaje->remisionfruto
+            ]);
+
+            $this->ticket = $this->viaje->ticket;
+            $this->ticket_c = $this->viaje->ticket_c;
+            $this->peso_bruto = $this->viaje->peso_bruto;
+            $this->tara = $this->viaje->tara;
+            $this->calidad = $this->viaje->ajuste_calidad;
+
+            $this->detalles = [];
+
+            foreach ($this->viaje->detalles as $detalle) {
+
+                $this->detalles[] = [
+                    'id' => $detalle->det_viaje_fruto_id,
+
+                    'lote' => $detalle->det_remision->invfruta->lote->nombre,
+
+                    'cantidad_cargada' => $detalle->det_remision->cantidad_cargada,
+
+                    'promedio' => $detalle->promedio,
+
+                    'peso_neto' => $detalle->peso_neto,
+                ];
+            }
+            $this->calcularPesoNetoViaje();
+
+        } else {
+
+            $this->remisiones = RemisionFruto::whereDoesntHave('viajeFruto')
+                ->get();
+        }
     }
 
     public function updatedRemisionSeleccionada($id)
@@ -54,6 +122,11 @@ new class extends Component
 
     }
 
+    public function getPesoFinalProperty()
+    {
+        return (float) $this->peso_neto_viaje - (float) $this->calidad;
+    }
+
     public function recalcularPesos()
     {
         $this->subtotal_detalles = collect($this->detalles)
@@ -68,10 +141,6 @@ new class extends Component
             2
         );
     }
-
-
-
-    
 
     public function updatedDetalles($value, $key)
     {
@@ -111,6 +180,63 @@ new class extends Component
 
         $this->recalcularPesos();
     }
+
+    public function save()
+    {
+        $this->validate();
+
+        if ((float) $this->peso_restante != 0) {
+
+            Flux::toast(
+                heading: 'Peso pendiente',
+                text: 'El peso neto aún no ha sido distribuido completamente entre los detalles del viaje.',
+                variant: 'warning'
+            );
+
+            return;
+        }
+
+        DB::transaction(function () {
+
+            $viaje = $this->viaje ?? new ViajeFruto();
+
+            $viaje->fill([
+                'fecha'             => $this->fecha,
+                'remision_fruto_id' => $this->remisionSeleccionada,
+                'ticket'            => $this->ticket,
+                'ticket_c'          => $this->ticket_c,
+                'peso_bruto'        => $this->peso_bruto,
+                'tara'              => $this->tara,
+                'peso_neto'         => $this->peso_neto_viaje,
+                'ajuste_calidad'    => $this->calidad,
+                'peso_final'        => $this->pesoFinal,
+            ]);
+
+            $viaje->save();
+
+            // Si estamos editando, reconstruimos los detalles
+            $viaje->detalles()->delete();
+
+            foreach ($this->detalles as $detalle) {
+
+                DetalleViaje::create([
+                    'viaje_fruto_id'     => $viaje->id,
+                    'det_viaje_fruto_id' => $detalle['id'],
+                    'promedio'           => $detalle['promedio'],
+                    'peso_neto'          => $detalle['peso_neto'],
+                ]);
+            }
+        });
+
+        session()->flash(
+            'success',
+            $this->viaje
+                ? 'Viaje actualizado correctamente.'
+                : 'Viaje creado correctamente.'
+        );
+
+        return redirect()->route('viajes-fruto.index');
+    }
     
 };
 ?>
@@ -141,24 +267,43 @@ new class extends Component
                 <flux:error name="fecha" />
             </flux:field>
 
-            <flux:field>
-            <flux:label for="remision_id">Remision</flux:label>
+            @if ($viaje)
 
-                <flux:select
-                    id="finca_id"
-                    name="finca_id"
-                    wire:model.live="remisionSeleccionada">
-                    <option value="">Seleccione...</option>
+                <flux:field>
+                    <flux:label for="remision">Remisión</flux:label>
 
-                    @foreach ($remisiones as $remision)
-                        <option value="{{ $remision->id }}">
-                            {{ $remision->remision }}
-                        </option>
-                    @endforeach
-                </flux:select>
+                    <flux:input
+                        type="text"
+                        value="{{ $viaje->remisionfruto?->remision }}"
+                        readonly
+                    />
 
-                <flux:error name="remisionSeleccionada" />
-            </flux:field>
+                    <flux:error name="remisionSeleccionada" />
+                </flux:field>
+
+            @else
+
+                <flux:field>
+                    <flux:label for="remision_id">Remisión</flux:label>
+
+                    <flux:select
+                        id="remision_id"
+                        wire:model.live="remisionSeleccionada"
+                    >
+                        <option value="">Seleccione...</option>
+
+                        @foreach ($remisiones as $remision)
+                            <option value="{{ $remision->id }}">
+                                {{ $remision->remision }}
+                            </option>
+                        @endforeach
+
+                    </flux:select>
+
+                    <flux:error name="remisionSeleccionada" />
+                </flux:field>
+
+            @endif
 
             <flux:field>
                 <flux:label for="ticket"># Ticket</flux:label>
@@ -227,7 +372,7 @@ new class extends Component
                 <flux:input
                     type="number"
                     id="calidad"
-                    wire:model="calidad"
+                    wire:model.live="calidad"
                 />
 
                 <flux:error name="calidad" />
@@ -239,7 +384,7 @@ new class extends Component
                 <flux:input
                     type="number"
                     id="peso_final"
-                    wire:model.live="peso_final"
+                    :value="$this->pesoFinal"
                     readonly
                 />
 

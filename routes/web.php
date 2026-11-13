@@ -41,7 +41,7 @@ Route::prefix('{current_team}')
         Route::resource('proveedores', ProvedoreController::class)->except(['show']);
         Route::resource('conductores', ConductoreController::class)->except(['show']);
         Route::resource('alce-fruto', \App\Http\Controllers\RemisionFrutoController::class)->except(['show']);
-        Route::resource('viajes-fruto', \App\Http\Controllers\ViajeFrutoController::class)->except(['show']);
+        Route::resource('viajes-fruto', \App\Http\Controllers\ViajeFrutoController::class)->except(['show','store','update']);
     });
 
 Route::middleware(['auth'])->group(function () {

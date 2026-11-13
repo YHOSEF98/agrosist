@@ -13,7 +13,7 @@
                     Completa los datos básicos del viaje de fruto.</p>
 
             </div>
-                @livewire('modules.viajes-fruto', ['viaje' => $viaje?->id])
+                @livewire('modules.viajes-fruto', ['viaje' => $viaje])
 
 
         </div>

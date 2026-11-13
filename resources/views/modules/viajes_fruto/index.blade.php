@@ -38,10 +38,7 @@
                                 Destino 
                             </th>
                             <th scope="col" class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                Proveedor 
-                            </th>
-                            <th scope="col" class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                Placa 
+                                Peso 
                             </th>
                             <th scope="col" class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
                                 Acciones 
@@ -51,29 +48,28 @@
                     <tbody class="divide-y divide-neutral-200 dark:divide-neutral-700">
                         @forelse ($viajes as $viaje)
                             <tr>
-                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $remision->fecha }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $remision->viajefruto?->ticket ?? '' }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $remision->remision }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $remision->team->name }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $remision->destino->nombre_comercial }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $remision->proveedor->nombre_comercial }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $remision->placa }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $viaje->fecha }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $viaje->ticket }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $viaje->remisionfruto?->remision }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $viaje->remisionfruto?->team->name }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $viaje->remisionfruto?->destino->razon_social }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">{{ $viaje->peso_final }}</td>
                                 <td class="px-4 py-2 text-sm text-gray-900 dark:text-gray-100">
                                     <div class="inline-flex items-center gap-2">
 
-                                        <a class="text-blue-600 hover:underline" title="Editar" href="{{ route('alce-fruto.edit', 
+                                        <a class="text-blue-600 hover:underline" title="Editar" href="{{ route('viajes-fruto.edit', 
                                             ['current_team' => request()->route('current_team'),
-                                                'viaje' => $remision->id, ]) }}">
+                                                'viajes_fruto' => $viaje->id, ]) }}">
                                             <flux:icon.pencil-square class="h-5 w-5 text-blue-600" />
                                         </a>
                                         <flux:button size="xs" class="text-red-600 hover:text-red-800" icon="archive-box-x-mark"
                                             variant="outline" color="red" title="Eliminar"
                                             x-on:click="
-                                                remision = {
-                                                    nombre: @js($remision->remision),
-                                                    url: @js(route('alce-fruto.destroy', [
+                                                viaje = {
+                                                    nombre: @js($viaje->fecha.' - ticket '.$viaje->ticket),
+                                                    url: @js(route('viajes-fruto.destroy', [
                                                         'current_team' => request()->route('current_team'),
-                                                        'alce_fruto' => $remision->id,
+                                                        'viajes_fruto' => $viaje->id,
                                                     ])),
                                                 };
                                                 $flux.modal('delete-lote').show();" >
@@ -97,16 +93,16 @@
                     </tbody>
                 </table>
                 <flux:modal name="delete-lote" class="min-w-[22rem]">
-                <form method="POST" x-bind:action="remision.url" class="space-y-6">
+                <form method="POST" x-bind:action="viaje.url" class="space-y-6">
                     @csrf
                     @method('DELETE')
 
                     <div>
-                        <flux:heading size="lg">¿Eliminar la remisión <span x-text="remision.nombre"></span>?</flux:heading>
+                        <flux:heading size="lg">¿Eliminar el viaje <span x-text="viaje.nombre"></span>?</flux:heading>
 
                         <flux:text class="mt-2">
-                            Está a punto de eliminar la remisión
-                            <strong>"<span x-text="remision.nombre"></span>"</strong>.<br>
+                            Está a punto de eliminar el viaje
+                            <strong>"<span x-text="viaje.nombre"></span>"</strong>.<br>
                             Esta acción no se puede deshacer.
                         </flux:text>
                     </div>

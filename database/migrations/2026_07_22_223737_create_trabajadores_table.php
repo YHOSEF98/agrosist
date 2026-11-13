@@ -27,7 +27,7 @@ return new class extends Migration
             $table->foreignId('cargo_id')->constrained('cargos')->onDelete('cascade');
             $table->decimal('salario', 10, 2);
             $table->decimal('aux_transporte', 10, 2)->nullable();
-            $table->enum('estatus', ['Activo', 'Inactivo'])->default('activo');
+            $table->boolean('estatus')->default(true);
             $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
             $table->timestamps();
         });

@@ -17,7 +17,7 @@ class DetalleViaje extends Model
         return $this->belongsTo(ViajeFruto::class, 'viaje_fruto_id');
     }
 
-    public function det_viaje(){
+    public function det_remision(){
         return $this->belongsTo(DetViajeFruto::class, 'det_viaje_fruto_id');
     }
 }
